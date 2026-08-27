@@ -1,0 +1,49 @@
+# =========================================================================
+# Fisioterapeuta Li — Entorno Unificado (HackTech 5.0)
+# =========================================================================
+
+services:
+  # ── BACKEND (Flask API) ──
+  backend:
+    build:
+      context: ./Backend
+    container_name: fisio_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./Backend/.env
+    volumes:
+      - ./Backend:/app
+
+  # ── FRONTEND (Sitio Web Estático) ──
+  frontend:
+    image: nginx:alpine
+    container_name: fisio_frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./SitioWeb:/usr/share/nginx/html
+
+  # ── ORQUESTADOR (n8n) ──
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: fisio_n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - NODE_ENV=production
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Bogota
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - backend
+
+volumes:
+  n8n_data:

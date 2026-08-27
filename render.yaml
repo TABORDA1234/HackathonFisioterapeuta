@@ -1,0 +1,54 @@
+services:
+  # ── BACKEND (Flask API) ──
+  - type: web
+    name: fisio-backend
+    env: python
+    rootDir: Backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT "app:create_app()"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: N8N_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+  # ── FRONTEND (Sitio Web) ──
+  - type: web
+    name: fisio-frontend
+    env: static
+    rootDir: SitioWeb
+    staticPublishPath: .
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+
+  # ── ORQUESTADOR (n8n) ──
+  - type: web
+    name: fisio-n8n
+    env: docker
+    rootDir: n8n
+    envVars:
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: true
+      - key: N8N_BASIC_AUTH_USER
+        sync: false
+      - key: N8N_BASIC_AUTH_PASSWORD
+        sync: false
+      - key: N8N_HOST
+        value: fisio-n8n.onrender.com
+      - key: N8N_PORT
+        value: 5678
+      - key: N8N_PROTOCOL
+        value: https
+      - key: NODE_ENV
+        value: production
+      - key: WEBHOOK_URL
+        value: https://fisio-n8n.onrender.com/
