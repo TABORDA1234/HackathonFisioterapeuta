@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────
+# Fisioterapeuta Li — Docker Compose
+# Backend API + PostgreSQL
+# ─────────────────────────────────────────────
+
+services:
+  # ── Base de datos PostgreSQL ──
+  db:
+    image: postgres:16-alpine
+    container_name: fisio_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: fisio_user
+      POSTGRES_PASSWORD: fisio_pass
+      POSTGRES_DB: fisio_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fisio_user -d fisio_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend API Flask ──
+  api:
+    build: .
+    container_name: fisio_api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://fisio_user:fisio_pass@db:5432/fisio_db
+      FLASK_ENV: development
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app  # Hot reload en desarrollo
+    command: >
+      python app.py
+
+volumes:
+  postgres_data:
