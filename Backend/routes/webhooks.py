@@ -116,6 +116,50 @@ def webhook_nueva_cita():
     }), 201
 
 
+@webhooks_bp.route("/feedback", methods=["POST"])
+@api_key_required
+def webhook_recibir_feedback():
+    """
+    POST /api/webhooks/feedback
+    n8n envía el feedback recolectado post-sesión.
+    Body: { "cita_id": 1, "calificacion": 5, "comentario": "Excelente" }
+    """
+    data = request.get_json()
+    if not data or "cita_id" not in data or "calificacion" not in data:
+        return jsonify({"error": "Body JSON requerido con cita_id y calificacion"}), 400
+
+    from models.feedback import Feedback
+    cita = Cita.query.get(data["cita_id"])
+    if not cita:
+        return jsonify({"error": "Cita no encontrada"}), 404
+
+    nuevo_feedback = Feedback(
+        cita_id=cita.id,
+        calificacion=data["calificacion"],
+        comentario=data.get("comentario", "")
+    )
+    
+    db.session.add(nuevo_feedback)
+    
+    # Podríamos cambiar el estado de la cita a "completada" aquí automáticamente
+    if cita.estado != "completada":
+        cita.estado = "completada"
+        
+    db.session.commit()
+
+    registrar_operacion(
+        accion="recibir_feedback",
+        entidad="feedback",
+        entidad_id=nuevo_feedback.id,
+        detalle=f"Feedback recibido para cita {cita.id}: {data['calificacion']} estrellas",
+        origen="n8n",
+    )
+
+    return jsonify({
+        "message": "Feedback guardado exitosamente",
+        "feedback": nuevo_feedback.to_dict()
+    }), 201
+
 @webhooks_bp.route("/cancelar-cita", methods=["POST"])
 @api_key_required
 def webhook_cancelar_cita():

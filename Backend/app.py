@@ -6,7 +6,7 @@ Entry point con Application Factory pattern.
 import os
 from flask import Flask, jsonify
 from config import config_by_name
-from extensions import db, migrate, cors, limiter, ma
+from extensions import db, cors, limiter, ma
 
 
 def create_app(config_name=None):
@@ -25,7 +25,6 @@ def create_app(config_name=None):
 
     # ── Inicializar extensiones ──
     db.init_app(app)
-    migrate.init_app(app, db)
     cors.init_app(app, origins=app.config["CORS_ORIGINS"])
     limiter.init_app(app)
     ma.init_app(app)

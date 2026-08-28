@@ -1,6 +1,10 @@
-// URL base del backend
-// En producción (Render), cambiaremos esto por la URL real
-const API_BASE_URL = 'http://localhost:5000/api';
+// ==========================================
+// Fisioterapeuta Li — Frontend JS
+// Consume la API REST del Backend Flask
+// ==========================================
+
+// URL base del backend. Se puede cambiar en produccion.
+const API_BASE_URL = window.FISIO_API_URL || 'http://localhost:5000/api';
 
 // Elementos del DOM
 const serviciosGrid = document.getElementById('servicios-grid');
@@ -16,7 +20,7 @@ const reservaForm = document.getElementById('reserva-form');
 const mensajeExito = document.getElementById('mensaje-exito');
 const btnNuevaCita = document.getElementById('btn-nueva-cita');
 
-// Establecer fecha mínima en el input de fecha (hoy)
+// Establecer fecha minima en el input de fecha (hoy)
 const hoy = new Date().toISOString().split('T')[0];
 fechaInput.setAttribute('min', hoy);
 
@@ -27,7 +31,10 @@ async function cargarServicios() {
     try {
         const res = await fetch(`${API_BASE_URL}/servicios`);
         if (!res.ok) throw new Error('Error de red');
-        const servicios = await res.json();
+        const data = await res.json();
+        
+        // La API devuelve { "servicios": [...], "total": N }
+        const servicios = data.servicios || data;
         
         // Limpiar
         serviciosGrid.innerHTML = '';
@@ -37,12 +44,17 @@ async function cargarServicios() {
             // Renderizar tarjeta en el grid
             const card = document.createElement('div');
             card.className = 'servicio-card';
+            
+            const precioFormateado = servicio.precio
+                ? `$${Number(servicio.precio).toLocaleString('es-CO')}`
+                : 'Consultar';
+
             card.innerHTML = `
                 <h3>${servicio.nombre}</h3>
-                <p>${servicio.descripcion}</p>
+                <p>${servicio.descripcion || ''}</p>
                 <div class="servicio-meta">
-                    <span>⏱ ${servicio.duracion_min} min</span>
-                    <span>💰 $${servicio.precio.toLocaleString('es-CO')}</span>
+                    <span>&#9201; ${servicio.duracion_min} min</span>
+                    <span>${precioFormateado}</span>
                 </div>
             `;
             // Click en tarjeta selecciona el servicio en el form y hace scroll
@@ -52,7 +64,7 @@ async function cargarServicios() {
             });
             serviciosGrid.appendChild(card);
 
-            // Agregar opción al select
+            // Agregar opcion al select
             const option = document.createElement('option');
             option.value = servicio.id;
             option.textContent = `${servicio.nombre} (${servicio.duracion_min} min)`;
@@ -61,7 +73,7 @@ async function cargarServicios() {
 
     } catch (error) {
         console.error('Error cargando servicios:', error);
-        serviciosGrid.innerHTML = '<p class="error">No se pudieron cargar los servicios. Asegúrate de que el servidor esté encendido.</p>';
+        serviciosGrid.innerHTML = '<p class="error-msg">No se pudieron cargar los servicios. Verifica que el servidor del backend este encendido.</p>';
     }
 }
 
@@ -92,24 +104,27 @@ btnBuscar.addEventListener('click', async () => {
         
         horariosContainer.classList.remove('hidden');
 
-        if (data.disponibles.length === 0) {
-            horariosMsg.textContent = 'No hay horarios disponibles para este día.';
+        // La API devuelve { "slots_disponibles": ["2026-08-29T08:00:00", ...] }
+        const slots = data.slots_disponibles || [];
+
+        if (slots.length === 0) {
+            horariosMsg.textContent = 'No hay horarios disponibles para este dia. Intenta otra fecha.';
         } else {
-            data.disponibles.forEach(slot => {
+            slots.forEach(slot => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'btn btn-outline';
-                // Convertir '08:00:00' a '08:00'
-                const horaLimpia = slot.inicio.substring(0, 5);
+                // Extraer la hora de un ISO string como "2026-08-29T08:00:00"
+                const horaLimpia = slot.substring(11, 16);
                 btn.textContent = horaLimpia;
                 
                 btn.addEventListener('click', () => {
-                    // Quitar selección previa
+                    // Quitar seleccion previa
                     document.querySelectorAll('.horarios-grid .btn').forEach(b => b.classList.remove('selected'));
                     // Marcar este
                     btn.classList.add('selected');
-                    // Guardar valor
-                    horaSeleccionadaInput.value = `${fecha}T${slot.inicio}`;
+                    // Guardar valor (el ISO completo del slot)
+                    horaSeleccionadaInput.value = slot;
                     // Mostrar paso 3
                     datosPaciente.classList.remove('hidden');
                 });
@@ -120,7 +135,8 @@ btnBuscar.addEventListener('click', async () => {
         }
     } catch (error) {
         console.error('Error buscando disponibilidad:', error);
-        alert('Hubo un error consultando la disponibilidad.');
+        horariosContainer.classList.remove('hidden');
+        horariosMsg.textContent = 'Error al consultar disponibilidad. Verifica la conexion.';
     } finally {
         btnBuscar.textContent = 'Buscar Disponibilidad';
         btnBuscar.disabled = false;
@@ -133,13 +149,18 @@ btnBuscar.addEventListener('click', async () => {
 reservaForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const clienteNombre = document.getElementById('nombre-input').value;
-    const clienteTelefono = document.getElementById('telefono-input').value;
+    const clienteNombre = document.getElementById('nombre-input').value.trim();
+    const clienteTelefono = document.getElementById('telefono-input').value.trim();
     const servicioId = servicioSelect.value;
     const fechaHora = horaSeleccionadaInput.value;
 
     if (!fechaHora) {
-        alert('Asegúrate de seleccionar una hora.');
+        alert('Asegurate de seleccionar una hora.');
+        return;
+    }
+
+    if (!clienteNombre || !clienteTelefono) {
+        alert('Por favor ingresa tu nombre y telefono.');
         return;
     }
 
@@ -148,19 +169,17 @@ reservaForm.addEventListener('submit', async (e) => {
     btnConfirmar.disabled = true;
 
     try {
+        // Usamos el endpoint de webhooks/nueva-cita que busca o crea cliente automaticamente
+        // Asi no necesitamos un cliente_id existente previamente
         const payload = {
-            cliente: {
-                nombre: clienteNombre,
-                telefono: clienteTelefono
-            },
-            cita: {
-                servicio_id: parseInt(servicioId),
-                fecha_hora: fechaHora,
-                origen: 'web'
-            }
+            cliente_nombre: clienteNombre,
+            cliente_telefono: clienteTelefono,
+            servicio_id: parseInt(servicioId),
+            fecha_hora: fechaHora,
+            origen: 'web'
         };
 
-        const res = await fetch(`${API_BASE_URL}/citas`, {
+        const res = await fetch(`${API_BASE_URL}/citas/reservar`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -169,7 +188,7 @@ reservaForm.addEventListener('submit', async (e) => {
         const data = await res.json();
 
         if (res.ok) {
-            // Mostrar éxito
+            // Mostrar exito
             reservaForm.classList.add('hidden');
             mensajeExito.classList.remove('hidden');
         } else {
@@ -178,7 +197,7 @@ reservaForm.addEventListener('submit', async (e) => {
 
     } catch (error) {
         console.error('Error creando reserva:', error);
-        alert('Error de conexión con el servidor.');
+        alert('Error de conexion con el servidor.');
     } finally {
         btnConfirmar.textContent = 'Confirmar Reserva';
         btnConfirmar.disabled = false;

@@ -1,0 +1,298 @@
+{
+  "name": "FisioLi - Flujo Completo (Telegram + Ollama + Backend + Google)",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/generate",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "fisio-ai"
+            },
+            {
+              "name": "prompt",
+              "value": "={{$json.message.text}}"
+            },
+            {
+              "name": "stream",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ollama-request",
+      "name": "IA Local (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "={{ JSON.parse($json.response).intencion }}"
+      },
+      "id": "parse-intent",
+      "name": "Parsear JSON IA",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.content }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "agendar_cita",
+              "outputKey": "Agendar"
+            },
+            {
+              "value2": "cancelar_cita",
+              "outputKey": "Cancelar"
+            }
+          ]
+        }
+      },
+      "id": "switch-intent",
+      "name": "Decisor de Intención",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fisio-backend:5000/api/webhooks/nueva-cita",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "cambiar-esto-por-una-api-key-segura"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "cliente_nombre",
+              "value": "={{ JSON.parse($node['IA Local (Ollama)'].json.response).datos.nombre }}"
+            },
+            {
+              "name": "fecha",
+              "value": "={{ JSON.parse($node['IA Local (Ollama)'].json.response).datos.fecha }}"
+            },
+            {
+              "name": "hora",
+              "value": "={{ JSON.parse($node['IA Local (Ollama)'].json.response).datos.hora }}"
+            },
+            {
+              "name": "servicio",
+              "value": "={{ JSON.parse($node['IA Local (Ollama)'].json.response).datos.servicio }}"
+            },
+            {
+              "name": "telegram_id",
+              "value": "={{ $node['Telegram Trigger'].json.message.from.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "backend-book",
+      "name": "Guardar en BD (Backend)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        900,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "start": "={{ $json.cita.fecha_hora }}",
+        "end": "={{ $json.cita.fecha_hora }}",
+        "title": "=Cita: {{$json.cliente.nombre}} - {{$json.cita.servicio_nombre}}",
+        "description": "Agendado vía Telegram"
+      },
+      "id": "google-calendar",
+      "name": "Google Calendar (Crear Evento)",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [
+        1150,
+        150
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $node['Telegram Trigger'].json.message.chat.id }}",
+        "text": "=¡Cita confirmada! Te esperamos el {{$node['Guardar en BD (Backend)'].json.cita.fecha_hora}}",
+        "additionalFields": {}
+      },
+      "id": "telegram-reply-success",
+      "name": "Telegram Responder (Éxito)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1400,
+        150
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "subject": "=Confirmación de Cita - Fisioterapeuta Li",
+        "message": "=Hola {{$json.cliente.nombre}}, tu cita ha sido confirmada.",
+        "to": "={{$json.cliente.email || 'correo@ejemplo.com'}}"
+      },
+      "id": "gmail-send",
+      "name": "Gmail (Enviar Correo)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1600,
+        150
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "IA Local (Ollama)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IA Local (Ollama)": {
+      "main": [
+        [
+          {
+            "node": "Parsear JSON IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear JSON IA": {
+      "main": [
+        [
+          {
+            "node": "Decisor de Intención",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decisor de Intención": {
+      "main": [
+        [
+          {
+            "node": "Guardar en BD (Backend)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Guardar en BD (Backend)": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar (Crear Evento)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar (Crear Evento)": {
+      "main": [
+        [
+          {
+            "node": "Telegram Responder (Éxito)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Responder (Éxito)": {
+      "main": [
+        [
+          {
+            "node": "Gmail (Enviar Correo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f7ab0a72-7b56-4c4b-b0b4-9c4c781079d8"
+}

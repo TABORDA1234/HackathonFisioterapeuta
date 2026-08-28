@@ -297,6 +297,99 @@ def crear_cita():
     }), 201
 
 
+@citas_bp.route("/reservar", methods=["POST"])
+def reservar_cita():
+    """
+    POST /api/citas/reservar
+    Endpoint público para el sitio web. Busca o crea el cliente
+    automáticamente y luego agenda la cita validando disponibilidad.
+    Body: {
+        "cliente_nombre": "Ana Pérez",
+        "cliente_telefono": "+57 300 000 0000",
+        "servicio_id": 1,
+        "fecha_hora": "2026-08-29T10:00:00",
+        "origen": "web"
+    }
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Body JSON requerido"}), 400
+
+    nombre = data.get("cliente_nombre", "").strip()
+    telefono = data.get("cliente_telefono", "").strip()
+    servicio_id = data.get("servicio_id")
+    fecha_hora_str = data.get("fecha_hora")
+    origen = data.get("origen", "web")
+
+    # Validaciones básicas
+    if not nombre:
+        return jsonify({"error": "El nombre del paciente es obligatorio"}), 400
+    if not telefono:
+        return jsonify({"error": "El teléfono del paciente es obligatorio"}), 400
+    if not servicio_id:
+        return jsonify({"error": "El ID del servicio es obligatorio"}), 400
+    if not fecha_hora_str:
+        return jsonify({"error": "La fecha y hora son obligatorias"}), 400
+
+    # Verificar servicio
+    servicio = Servicio.query.get(servicio_id)
+    if not servicio or not servicio.activo:
+        return jsonify({"error": "Servicio no encontrado"}), 404
+
+    # Parsear fecha_hora
+    try:
+        fecha_hora = datetime.fromisoformat(str(fecha_hora_str))
+    except (ValueError, TypeError):
+        return jsonify({"error": "Formato de fecha/hora invalido"}), 400
+
+    # No permitir fechas pasadas
+    ahora = datetime.now(timezone.utc).replace(tzinfo=None)
+    if fecha_hora < ahora:
+        return jsonify({"error": "No se puede crear una cita en el pasado"}), 400
+
+    # Verificar disponibilidad
+    fecha = fecha_hora.date()
+    slots = calcular_disponibilidad(fecha, servicio_id)
+    fecha_hora_iso = fecha_hora.isoformat()
+    slot_valido = any(fecha_hora_iso.startswith(s[:16]) for s in slots)
+
+    if not slot_valido:
+        return jsonify({
+            "error": "El horario seleccionado no esta disponible",
+            "slots_disponibles": slots,
+        }), 409
+
+    # Buscar o crear cliente por teléfono
+    cliente = Cliente.query.filter_by(telefono=telefono).first()
+    if not cliente:
+        cliente = Cliente(nombre=nombre, telefono=telefono)
+        db.session.add(cliente)
+        db.session.flush()
+
+    # Crear la cita
+    nueva_cita = Cita(
+        cliente_id=cliente.id,
+        servicio_id=servicio_id,
+        fecha_hora=fecha_hora,
+        estado="pendiente",
+        origen=origen,
+    )
+    db.session.add(nueva_cita)
+    db.session.commit()
+
+    registrar_operacion(
+        accion="crear_cita",
+        entidad="cita",
+        entidad_id=nueva_cita.id,
+        detalle=f"Reserva web: {cliente.nombre} - {servicio.nombre} el {fecha_hora}",
+        origen=origen,
+    )
+
+    return jsonify({
+        "message": "Cita reservada exitosamente",
+        "cita": nueva_cita.to_dict(),
+        "cliente": cliente.to_dict(),
+    }), 201
 @citas_bp.route("/<int:cita_id>", methods=["PUT"])
 @jwt_required
 def actualizar_cita(cita_id):
