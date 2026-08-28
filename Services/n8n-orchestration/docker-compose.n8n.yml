@@ -1,0 +1,81 @@
+# services/n8n-orchestration/docker-compose.n8n.yml
+#
+# Este es un FRAGMENTO, no un compose independiente. En un monorepo cada módulo
+# aporta su propio archivo docker-compose.<modulo>.yml y se levantan todos juntos
+# desde la raíz combinando archivos con `-f`. Así cada quien mantiene su parte
+# sin generar conflictos de merge en un único docker-compose.yml gigante.
+#
+# Uso desde la raíz del monorepo (ejemplo con 3 módulos ya integrados):
+#
+#   docker compose \
+#     -f docker-compose.yml \
+#     -f services/n8n-orchestration/docker-compose.n8n.yml \
+#     -f services/ai-service/docker-compose.ai.yml \
+#     -f services/calendar-service/docker-compose.calendar.yml \
+#     up -d
+#
+# Requisito: el docker-compose.yml raíz debe definir la red externa "fisioli_net"
+# (bridge) una sola vez. Si aún no existe, agregar esto al compose raíz:
+#
+#   networks:
+#     fisioli_net:
+#       name: fisioli_net
+#       driver: bridge
+
+version: "3.8"
+
+services:
+  n8n_db:
+    image: postgres:16-alpine
+    container_name: fisioli_n8n_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${N8N_DB_USER}
+      POSTGRES_PASSWORD: ${N8N_DB_PASSWORD}
+      POSTGRES_DB: ${N8N_DB_NAME}
+    volumes:
+      - n8n_db_data:/var/lib/postgresql/data
+    networks:
+      - fisioli_net
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: fisioli_n8n
+    restart: unless-stopped
+    depends_on:
+      - n8n_db
+    ports:
+      - "5678:5678"
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: n8n_db
+      DB_POSTGRESDB_DATABASE: ${N8N_DB_NAME}
+      DB_POSTGRESDB_USER: ${N8N_DB_USER}
+      DB_POSTGRESDB_PASSWORD: ${N8N_DB_PASSWORD}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      N8N_HOST: ${N8N_HOST:-localhost}
+      WEBHOOK_URL: ${N8N_WEBHOOK_URL:-http://localhost:5678/}
+      GENERIC_TIMEZONE: America/Bogota
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+      AI_SERVICE_URL: ${AI_SERVICE_URL}
+      CALENDAR_SERVICE_URL: ${CALENDAR_SERVICE_URL}
+      GMAIL_SERVICE_URL: ${GMAIL_SERVICE_URL}
+      DRIVE_SHEETS_SERVICE_URL: ${DRIVE_SHEETS_SERVICE_URL}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./services/n8n-orchestration/workflows:/home/node/.n8n/workflows-import
+    networks:
+      - fisioli_net
+
+volumes:
+  n8n_db_data:
+  n8n_data:
+
+networks:
+  fisioli_net:
+    external: true
