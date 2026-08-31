@@ -72,7 +72,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst item = $input.all()[0].json;\nconst chatId = $node['Preparar Memoria (StaticData)'].json.chatId;\nconst responseText = item.message.content;\n\n// Guardar la respuesta de la IA en el historial (como un string JSON)\nif (staticData.chats && staticData.chats[chatId]) {\n  staticData.chats[chatId].push({ role: 'assistant', content: responseText });\n}\n\nlet parsed;\ntry {\n  parsed = JSON.parse(responseText);\n} catch(e) {\n  parsed = {\n    estado: 'pedir_datos',\n    mensaje_usuario: 'Tuve un pequeño problema técnico procesando tu mensaje. ¿Me lo repites por favor?',\n    datos: {}\n  };\n}\n\nreturn [{ json: {\n  chatId: chatId,\n  estado: parsed.estado || 'pedir_datos',\n  mensaje_usuario: parsed.mensaje_usuario || 'Procesado.',\n  datos: parsed.datos || {}\n}}];"
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst item = $input.all()[0].json;\nconst chatId = $('Preparar Memoria (StaticData)').first().json.chatId;\nconst responseText = item.message.content;\n\n// Guardar la respuesta de la IA en el historial (como un string JSON)\nif (staticData.chats && staticData.chats[chatId]) {\n  staticData.chats[chatId].push({ role: 'assistant', content: responseText });\n}\n\nlet parsed;\ntry {\n  let cleanText = responseText.replace(/^```json\\n?/i, '').replace(/```$/,'').trim();\n  parsed = JSON.parse(cleanText);\n} catch(e) {\n  parsed = {\n    estado: 'pedir_datos',\n    mensaje_usuario: 'Tuve un pequeño problema técnico procesando tu mensaje. ¿Me lo repites por favor?',\n    datos: {}\n  };\n}\n\nreturn [{ json: {\n  chatId: chatId,\n  estado: parsed.estado || 'pedir_datos',\n  mensaje_usuario: parsed.mensaje_usuario || 'Procesado.',\n  datos: parsed.datos || {}\n}}];"
       },
       "id": "guardar-memoria",
       "name": "Guardar Respuesta en Memoria",
@@ -89,6 +89,7 @@
           "string": [
             {
               "value1": "={{ $json.estado }}",
+              "operation": "equal",
               "value2": "ejecutar_reserva"
             }
           ]
@@ -154,11 +155,11 @@
     {
       "parameters": {
         "calendar": "primary",
-        "start": "={{ $json.datos.fecha + 'T' + $json.datos.hora + ':00' }}",
-        "end": "={{ $json.datos.fecha + 'T' + $json.datos.hora + ':00' }}",
-        "title": "=Cita Fisioterapia: {{ $json.datos.nombre }}",
+        "start": "={{ $node['Guardar Respuesta en Memoria'].json.datos.fecha + 'T' + $node['Guardar Respuesta en Memoria'].json.datos.hora + ':00' }}",
+        "end": "={{ $node['Guardar Respuesta en Memoria'].json.datos.fecha + 'T' + $node['Guardar Respuesta en Memoria'].json.datos.hora + ':00' }}",
+        "title": "=Cita Fisioterapia: {{ $node['Guardar Respuesta en Memoria'].json.datos.nombre }}",
         "additionalFields": {
-          "description": "=Servicio: {{ $json.datos.servicio }}\nAgendado vía Telegram Bot"
+          "description": "=Servicio: {{ $node['Guardar Respuesta en Memoria'].json.datos.servicio }}\nAgendado vía Telegram Bot"
         }
       },
       "id": "google-calendar",
