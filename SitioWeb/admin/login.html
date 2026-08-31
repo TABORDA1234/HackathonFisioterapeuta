@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acceso Admin — La Fisioterapeuta Li</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+<div class="login-page">
+  <div class="login-bg"></div>
+
+  <div class="login-card glass" style="border-radius:var(--radius-xl); border:1px solid var(--color-border-light); box-shadow:var(--shadow-lg);">
+
+    <div class="login-logo">
+      <div class="login-logo-icon">🫁</div>
+      <div>
+        <div class="login-title">Panel Administrativo</div>
+        <div class="login-sub">La Fisioterapeuta Li — Lina Murillo</div>
+      </div>
+    </div>
+
+    <form id="login-form" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="username">Usuario <span class="required">*</span></label>
+        <input type="text" class="form-control" id="username" placeholder="admin" autocomplete="username" />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Contraseña <span class="required">*</span></label>
+        <div style="position:relative;">
+          <input type="password" class="form-control" id="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px;" />
+          <button type="button" id="toggle-pass" style="
+            position:absolute; right:12px; top:50%; transform:translateY(-50%);
+            background:none; border:none; color:var(--color-text-muted);
+            cursor:pointer; font-size:1rem; padding:4px;
+            transition:color var(--transition-fast);
+          " title="Mostrar/Ocultar">👁️</button>
+        </div>
+      </div>
+      <div id="login-error" class="form-error hidden" style="margin-bottom:var(--space-md);">
+        <span>❌</span> <span id="login-error-msg">Credenciales incorrectas</span>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-btn" style="margin-top:var(--space-md);">
+        Iniciar sesión
+      </button>
+    </form>
+
+    <div style="text-align:center; margin-top:var(--space-xl); padding-top:var(--space-xl); border-top:1px solid var(--color-border);">
+      <a href="../index.html" class="btn btn-ghost btn-sm">← Volver al sitio público</a>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+  // Si ya hay sesión, redirigir
+  Auth.redirectIfLoggedIn();
+
+  // Toggle contraseña
+  document.getElementById('toggle-pass').addEventListener('click', () => {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  });
+
+  // Login
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-error');
+    const errMsg = document.getElementById('login-error-msg');
+    errEl.classList.add('hidden');
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+      errMsg.textContent = 'Completa usuario y contraseña.';
+      errEl.classList.remove('hidden');
+      return;
+    }
+
+    Utils.setLoading(btn, true);
+    try {
+      const res = await AuthAPI.login(username, password);
+      Auth.setSession(res.token || res.access_token, res.user || { username });
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      errMsg.textContent = err.message || 'Credenciales incorrectas.';
+      errEl.classList.remove('hidden');
+      document.getElementById('password').value = '';
+    } finally {
+      Utils.setLoading(btn, false);
+    }
+  });
+
+  // Enter key
+  document.getElementById('password').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('login-form').dispatchEvent(new Event('submit'));
+  });
+</script>
+</body>
+</html>

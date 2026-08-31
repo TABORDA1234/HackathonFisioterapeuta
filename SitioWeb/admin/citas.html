@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda & Citas — Panel Admin · La Fisioterapeuta Li</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">🫁</div>
+      <div>
+        <div class="sidebar-brand-name">Fisioterapeuta Li</div>
+        <div class="sidebar-brand-sub">Panel de Administración</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Principal</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span> Dashboard</a>
+      <a href="citas.html" class="nav-item active"><span class="nav-item-icon">📅</span> Agenda & Citas</a>
+      <div class="nav-section-title">Pacientes</div>
+      <a href="pacientes.html" class="nav-item"><span class="nav-item-icon">👥</span> Pacientes</a>
+      <a href="historia-clinica.html" class="nav-item"><span class="nav-item-icon">📋</span> Historia Clínica</a>
+      <div class="nav-section-title">Sistema</div>
+      <a href="../index.html" target="_blank" class="nav-item"><span class="nav-item-icon">🌐</span> Sitio Público</a>
+      <button class="nav-item" id="btn-logout" style="border:none;background:none;width:100%;text-align:left;cursor:pointer;font-family:var(--font-primary);"><span class="nav-item-icon">🚪</span> Cerrar sesión</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebar-avatar">L</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Lina Murillo</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        <div>
+          <div class="topbar-title">Agenda & Citas</div>
+          <div class="topbar-breadcrumb" id="semana-label">Semana actual</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-ghost btn-sm" id="btn-semana-ant">‹ Anterior</button>
+        <button class="btn btn-ghost btn-sm" id="btn-hoy">Hoy</button>
+        <button class="btn btn-ghost btn-sm" id="btn-semana-sig">Siguiente ›</button>
+        <button class="btn btn-primary btn-sm" id="btn-nueva-cita">+ Nueva Cita</button>
+      </div>
+    </header>
+
+    <main class="admin-content">
+
+      <!-- Stats rápidas -->
+      <div class="grid grid-4 gap-md" style="margin-bottom:var(--space-xl);">
+        <div class="kpi-card kpi-teal" style="padding:var(--space-md);">
+          <div class="kpi-icon" style="width:40px;height:40px;font-size:1.1rem;">📅</div>
+          <div><div class="kpi-value" style="font-size:1.4rem;" id="stat-hoy">0</div><div class="kpi-label">Hoy</div></div>
+        </div>
+        <div class="kpi-card kpi-blue" style="padding:var(--space-md);">
+          <div class="kpi-icon" style="width:40px;height:40px;font-size:1.1rem;">📆</div>
+          <div><div class="kpi-value" style="font-size:1.4rem;" id="stat-semana">0</div><div class="kpi-label">Esta Semana</div></div>
+        </div>
+        <div class="kpi-card kpi-warn" style="padding:var(--space-md);">
+          <div class="kpi-icon" style="width:40px;height:40px;font-size:1.1rem;">⏳</div>
+          <div><div class="kpi-value" style="font-size:1.4rem;" id="stat-pendientes">0</div><div class="kpi-label">Pendientes</div></div>
+        </div>
+        <div class="kpi-card kpi-danger" style="padding:var(--space-md);">
+          <div class="kpi-icon" style="width:40px;height:40px;font-size:1.1rem;">❌</div>
+          <div><div class="kpi-value" style="font-size:1.4rem;" id="stat-canceladas">0</div><div class="kpi-label">Canceladas</div></div>
+        </div>
+      </div>
+
+      <div class="grid gap-xl" style="grid-template-columns:1fr 320px;">
+
+        <!-- Vista semanal -->
+        <div class="card" style="padding:0; overflow:hidden;">
+          <div id="schedule-wrapper" style="overflow-x:auto;">
+            <div class="schedule-grid" id="schedule-grid" style="min-width:700px;">
+              <!-- Generado por JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel lateral: Lista del día -->
+        <div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title" id="lista-dia-titulo">Citas del día</span>
+              <span class="badge badge-ok" id="lista-dia-count">0</span>
+            </div>
+            <div id="lista-dia">
+              <div class="empty-state" style="padding:var(--space-xl);">
+                <div class="empty-state-icon">📅</div>
+                <div class="empty-state-title">Haz clic en un día</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leyenda de colores -->
+          <div class="card" style="margin-top:var(--space-md);">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:var(--space-md);">Leyenda</div>
+            <div style="display:flex; flex-direction:column; gap:var(--space-sm);">
+              <div style="display:flex; align-items:center; gap:var(--space-sm);">
+                <div style="width:12px;height:12px;border-radius:3px;background:var(--sem-ok);flex-shrink:0;"></div>
+                <span style="font-size:0.82rem;">Confirmada</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:var(--space-sm);">
+                <div style="width:12px;height:12px;border-radius:3px;background:var(--sem-warn);flex-shrink:0;"></div>
+                <span style="font-size:0.82rem;">Pendiente de pago</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:var(--space-sm);">
+                <div style="width:12px;height:12px;border-radius:3px;background:var(--sem-danger);flex-shrink:0;"></div>
+                <span style="font-size:0.82rem;">Cancelada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal nueva cita -->
+<div class="modal-overlay hidden" id="modal-cita">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-cita-title">Nueva Cita</div>
+      <button class="modal-close" id="modal-cita-close">✕</button>
+    </div>
+    <form id="form-cita" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="cita-paciente">Paciente <span class="required">*</span></label>
+          <input type="text" class="form-control" id="cita-paciente" placeholder="Nombre del paciente" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cita-tel">Teléfono</label>
+          <input type="tel" class="form-control" id="cita-tel" placeholder="3XXXXXXXXX" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cita-servicio">Servicio <span class="required">*</span></label>
+        <select class="form-control" id="cita-servicio">
+          <option value="">— Selecciona servicio —</option>
+          <option value="Valoración Inicial">Valoración Inicial — $100.000</option>
+          <option value="Rehabilitación Física">Rehabilitación / Terapia Física — $100.000</option>
+          <option value="Prescripción de Ejercicio">Prescripción de Ejercicio — $60.000</option>
+          <option value="Modulación Postejercicio - Espalda">Modulación Postejercicio Espalda — $70.000</option>
+          <option value="Modulación Postejercicio - Miembros Inferiores">Modulación Postejercicio Miembros Inf. — $90.000</option>
+          <option value="Modulación Postejercicio - Cuerpo Completo">Modulación Postejercicio Cuerpo Completo — $150.000</option>
+          <option value="Punción Seca">Punción Seca — $120.000</option>
+          <option value="Terapia Neural">Terapia Neural — $150.000</option>
+          <option value="PRP">PRP — $250.000</option>
+          <option value="Sueroterapia">Sueroterapia — $300.000</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="cita-fecha">Fecha <span class="required">*</span></label>
+          <input type="date" class="form-control" id="cita-fecha" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cita-hora">Hora <span class="required">*</span></label>
+          <select class="form-control" id="cita-hora">
+            <option value="">— Hora —</option>
+            <option value="07:00">07:00</option>
+            <option value="08:00">08:00</option>
+            <option value="09:00">09:00</option>
+            <option value="10:00">10:00</option>
+            <option value="11:00">11:00</option>
+            <option value="14:00">14:00</option>
+            <option value="15:00">15:00</option>
+            <option value="16:00">16:00</option>
+            <option value="17:00">17:00</option>
+            <option value="18:00">18:00</option>
+            <option value="19:00">19:00</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cita-sede">Sede</label>
+          <select class="form-control" id="cita-sede">
+            <option value="tunja">Tunja</option>
+            <option value="turmeque">Turmequé</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cita-estado">Estado</label>
+        <select class="form-control" id="cita-estado">
+          <option value="pending">Pendiente de pago</option>
+          <option value="confirmed">Confirmada</option>
+          <option value="cancelled">Cancelada</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cita-notas">Notas</label>
+        <textarea class="form-control" id="cita-notas" rows="2" placeholder="Observaciones adicionales…"></textarea>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="modal-cita-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="modal-cita-save">Guardar Cita</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal detalle cita -->
+<div class="modal-overlay hidden" id="modal-detalle">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Detalle de Cita</div>
+      <button class="modal-close" id="modal-detalle-close">✕</button>
+    </div>
+    <div id="modal-detalle-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="modal-detalle-cancel">Cerrar</button>
+      <button class="btn btn-danger btn-sm" id="modal-detalle-cancelar">Cancelar cita</button>
+      <button class="btn btn-primary btn-sm" id="modal-detalle-confirmar">Confirmar cita</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/citas.js"></script>
+</body>
+</html>

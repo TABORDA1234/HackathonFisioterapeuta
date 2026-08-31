@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reservar Cita — La Fisioterapeuta Li</title>
+  <meta name="description" content="Reserva tu cita de fisioterapia en línea. Elige el servicio, la fecha disponible y confirma tu pago." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-logo">
+        <div class="logo-icon">🫁</div>
+        <span>La Fisioterapeuta <span style="color:var(--color-teal)">Li</span></span>
+      </a>
+      <a href="index.html" class="btn btn-ghost btn-sm">← Volver al inicio</a>
+    </div>
+  </div>
+</nav>
+
+<main style="padding-top:var(--header-height); min-height:100vh; background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(0,201,167,0.07) 0%, transparent 50%), var(--color-bg);">
+  <div class="container" style="padding-top:var(--space-3xl); padding-bottom:var(--space-4xl);">
+
+    <!-- Header -->
+    <div class="section-header center" style="margin-bottom:var(--space-2xl);">
+      <div class="section-tag">📅 Reserva Online</div>
+      <h1 style="font-size:clamp(1.8rem,4vw,2.8rem);">Agenda tu <span class="gradient-text">cita</span></h1>
+      <p style="max-width:480px; margin:var(--space-md) auto 0;">Pago anticipado del 100% requerido para confirmar. Cancelaciones con 24–48 h de anticipación.</p>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper" id="stepper" style="max-width:640px; margin:0 auto var(--space-3xl);">
+      <div class="step active" id="step-ind-1">
+        <div class="step-number">1</div>
+        <div class="step-label">Servicio</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-ind-2">
+        <div class="step-number">2</div>
+        <div class="step-label">Fecha & Hora</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-ind-3">
+        <div class="step-number">3</div>
+        <div class="step-label">Tus Datos</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-ind-4">
+        <div class="step-number">4</div>
+        <div class="step-label">Confirmar</div>
+      </div>
+    </div>
+
+    <div style="max-width:720px; margin:0 auto;">
+
+      <!-- PASO 1: Selección de servicio -->
+      <div id="step-1" class="step-panel">
+        <div class="card card-lg">
+          <h2 style="font-size:1.3rem; margin-bottom:var(--space-sm);">¿Qué servicio necesitas?</h2>
+          <p style="margin-bottom:var(--space-xl);">Selecciona el tipo de atención que buscas.</p>
+          <div id="service-list" style="display:flex; flex-direction:column; gap:var(--space-sm);">
+            <!-- Se llena con JS -->
+          </div>
+          <div style="margin-top:var(--space-xl); text-align:right;">
+            <button class="btn btn-primary" id="btn-step1-next" disabled>Siguiente →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 2: Fecha y hora -->
+      <div id="step-2" class="step-panel hidden">
+        <div class="card card-lg">
+          <h2 style="font-size:1.3rem; margin-bottom:var(--space-sm);">Elige fecha y hora</h2>
+          <p style="margin-bottom:var(--space-xl);">Solo se muestran los horarios disponibles.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="fecha-cita">Fecha <span class="required">*</span></label>
+              <input type="date" class="form-control" id="fecha-cita" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="sede-cita">Sede <span class="required">*</span></label>
+              <select class="form-control" id="sede-cita">
+                <option value="">— Selecciona sede —</option>
+                <option value="tunja">Tunja (Lunes a Viernes)</option>
+                <option value="turmeque">Turmequé (Sábados y Domingos)</option>
+              </select>
+            </div>
+          </div>
+          <div id="horarios-container" style="margin-top:var(--space-lg);">
+            <p style="color:var(--color-text-muted); font-size:0.9rem;">Selecciona una fecha y sede para ver horarios disponibles.</p>
+          </div>
+          <div style="margin-top:var(--space-xl); display:flex; gap:var(--space-md); justify-content:space-between;">
+            <button class="btn btn-ghost" id="btn-step2-back">← Atrás</button>
+            <button class="btn btn-primary" id="btn-step2-next" disabled>Siguiente →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 3: Datos del paciente -->
+      <div id="step-3" class="step-panel hidden">
+        <div class="card card-lg">
+          <h2 style="font-size:1.3rem; margin-bottom:var(--space-sm);">Tus datos de contacto</h2>
+          <p style="margin-bottom:var(--space-xl);">Para confirmar y enviarte el recibo de pago.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="nombre-p">Nombre completo <span class="required">*</span></label>
+              <input type="text" class="form-control" id="nombre-p" placeholder="Ej. María García López" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="doc-p">N° de documento <span class="required">*</span></label>
+              <input type="text" class="form-control" id="doc-p" placeholder="Cédula de ciudadanía" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="tel-p">Teléfono / WhatsApp <span class="required">*</span></label>
+              <input type="tel" class="form-control" id="tel-p" placeholder="3XXXXXXXXX" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email-p">Correo electrónico</label>
+              <input type="email" class="form-control" id="email-p" placeholder="correo@ejemplo.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="motivo-p">Motivo de consulta / Síntoma principal</label>
+            <textarea class="form-control" id="motivo-p" rows="3" placeholder="Describe brevemente por qué buscas atención..."></textarea>
+          </div>
+          <div class="card" style="background:rgba(245,158,11,0.05); border-color:rgba(245,158,11,0.2); padding:var(--space-md); margin-top:var(--space-sm);">
+            <div style="font-size:0.85rem; color:var(--color-text-muted);">
+              💳 <strong style="color:var(--color-text);">Pago anticipado requerido.</strong> 
+              Nequi / Llave: <strong style="color:var(--color-teal);">3113981422</strong> · Efectivo
+            </div>
+          </div>
+          <div style="margin-top:var(--space-xl); display:flex; gap:var(--space-md); justify-content:space-between;">
+            <button class="btn btn-ghost" id="btn-step3-back">← Atrás</button>
+            <button class="btn btn-primary" id="btn-step3-next">Ver resumen →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 4: Confirmación -->
+      <div id="step-4" class="step-panel hidden">
+        <div class="card card-lg">
+          <h2 style="font-size:1.3rem; margin-bottom:var(--space-xl);">Confirma tu reserva</h2>
+          <div id="resumen-reserva" style="display:flex; flex-direction:column; gap:var(--space-md); margin-bottom:var(--space-xl);">
+            <!-- Generado por JS -->
+          </div>
+          <div class="card" style="background:rgba(0,201,167,0.05); border-color:rgba(0,201,167,0.2); padding:var(--space-lg); margin-bottom:var(--space-xl);">
+            <div style="font-weight:700; color:var(--color-teal); margin-bottom:var(--space-sm);">📋 Política de Cancelación</div>
+            <div style="font-size:0.85rem; color:var(--color-text-muted);">Si necesitas cancelar o reagendar, hazlo con mínimo 24–48 horas de anticipación por WhatsApp al 3113981422. Fuera de este plazo la sesión se da por realizada y se pierde el valor pagado.</div>
+          </div>
+          <div style="display:flex; gap:var(--space-md); justify-content:space-between; flex-wrap:wrap;">
+            <button class="btn btn-ghost" id="btn-step4-back">← Atrás</button>
+            <button class="btn btn-primary btn-lg" id="btn-confirmar">
+              ✅ Confirmar Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 5: Éxito -->
+      <div id="step-5" class="step-panel hidden">
+        <div class="card card-lg text-center" style="padding:var(--space-4xl);">
+          <div style="font-size:4rem; margin-bottom:var(--space-lg); animation:float 3s ease-in-out infinite;">🎉</div>
+          <h2 style="margin-bottom:var(--space-md);">¡Reserva <span class="gradient-text">enviada!</span></h2>
+          <p style="margin-bottom:var(--space-xl);">Te contactaremos por WhatsApp al número indicado para confirmar el pago y tu cita.</p>
+          <div class="card" style="background:rgba(0,201,167,0.05); border-color:rgba(0,201,167,0.2); display:inline-block; padding:var(--space-lg) var(--space-xl); margin-bottom:var(--space-xl);">
+            <div style="font-size:1.1rem; font-weight:700; color:var(--color-teal);">📱 3113981422</div>
+            <div style="font-size:0.85rem; color:var(--color-text-muted);">WhatsApp de confirmación</div>
+          </div>
+          <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
+            <a href="https://wa.me/573113981422" target="_blank" class="btn btn-primary">💬 Ir a WhatsApp</a>
+            <a href="index.html" class="btn btn-outline">← Volver al inicio</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<a href="https://wa.me/573113981422" target="_blank" class="whatsapp-float">💬</a>
+
+<script src="js/api.js"></script>
+<script src="js/reservas.js"></script>
+</body>
+</html>
