@@ -38,7 +38,7 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - NODE_ENV=production
-      - WEBHOOK_URL=http://localhost:5678/
+      - WEBHOOK_URL=https://paragraph-gospel-freedom-deluxe.trycloudflare.com/
       - GENERIC_TIMEZONE=America/Bogota
     volumes:
       - n8n_data:/home/node/.n8n

@@ -1,5 +1,5 @@
 {
-  "name": "FisioLi - Flujo Completo (Telegram + Ollama + Backend + Google)",
+  "name": "FisioLi - Conversacional con Memoria Nativa",
   "nodes": [
     {
       "parameters": {
@@ -24,31 +24,13 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://host.docker.internal:11434/api/generate",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "model",
-              "value": "fisio-ai"
-            },
-            {
-              "name": "prompt",
-              "value": "={{$json.message.text}}"
-            },
-            {
-              "name": "stream",
-              "value": "false"
-            }
-          ]
-        },
-        "options": {}
+        "mode": "runOnceForAllItems",
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.chats = staticData.chats || {};\n\nconst item = $input.all()[0].json;\nconst chatId = item.message.chat.id;\nconst text = item.message.text || '';\n\n// Si el usuario escribe /start o algo para reiniciar, limpiamos memoria\nif (text.toLowerCase() === '/start' || text.toLowerCase() === 'reiniciar') {\n  staticData.chats[chatId] = [];\n}\n\n// Inicializar historial para el usuario si no existe\nif (!staticData.chats[chatId] || staticData.chats[chatId].length === 0) {\n  const systemPrompt = `Eres Fisioterapeuta Li, un asistente amigable por Telegram.\nTu objetivo es agendar citas.\n\nPara agendar, DEBES recolectar OBLIGATORIAMENTE 4 datos:\n1. nombre\n2. fecha (siempre en formato YYYY-MM-DD)\n3. hora (siempre en formato HH:MM)\n4. servicio (ej: Terapia Manual, Masaje)\n\nRESPONDE ÚNICAMENTE CON UN JSON VÁLIDO en este formato:\n{\n  \"estado\": \"pedir_datos\" | \"pedir_confirmacion\" | \"ejecutar_reserva\",\n  \"mensaje_usuario\": \"...\",\n  \"datos\": {\n    \"nombre\": \"\",\n    \"fecha\": \"\",\n    \"hora\": \"\",\n    \"servicio\": \"\"\n  }\n}\n\nREGLAS DE ESTADO:\n- 'pedir_datos': Si falta ALGÚN dato. En 'mensaje_usuario' hazle una pregunta corta y amable pidiendo lo que falta. Trata de no pedir todo de golpe si falta mucho.\n- 'pedir_confirmacion': SI YA TIENES LOS 4 DATOS, pero el usuario no ha confirmado. En 'mensaje_usuario' dile: 'Tengo todo listo para agendar tu cita para [Servicio] el [Fecha] a las [Hora] a nombre de [Nombre]. ¿Confirmas la reserva?'.\n- 'ejecutar_reserva': SOLO si estabas en 'pedir_confirmacion' y el usuario acaba de responder 'Sí', 'Confirmo', 'Ok' o similar. En 'mensaje_usuario' pon 'Procesando tu reserva...'.\n\nREGLAS DE DATOS:\n- Mantén siempre en el JSON los datos que ya hayas recolectado en el historial.\n- Convierte fechas a YYYY-MM-DD y horas a HH:MM.`;\n\n  staticData.chats[chatId] = [{ role: 'system', content: systemPrompt }];\n}\n\n// Limitar historial a los últimos 15 mensajes para no saturar a Ollama\nif (staticData.chats[chatId].length > 15) {\n  // Mantener el system prompt (index 0) y los últimos 14\n  staticData.chats[chatId] = [staticData.chats[chatId][0], ...staticData.chats[chatId].slice(-14)];\n}\n\n// Agregar mensaje del usuario\nstaticData.chats[chatId].push({ role: 'user', content: text });\n\nreturn [{ json: { chatId: chatId, messages: staticData.chats[chatId] } }];"
       },
-      "id": "ollama-request",
-      "name": "IA Local (Ollama)",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.1,
+      "id": "preparar-memoria",
+      "name": "Preparar Memoria (StaticData)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [
         250,
         300
@@ -56,47 +38,96 @@
     },
     {
       "parameters": {
-        "content": "={{ JSON.parse($json.response).intencion }}"
+        "method": "POST",
+        "url": "https://entree-ditch-computing.ngrok-free.dev/api/chat",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "ngrok-skip-browser-warning",
+              "value": "true"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"fisio-ai\",\n  \"messages\": {{ JSON.stringify($json.messages) }},\n  \"stream\": false,\n  \"format\": \"json\"\n}",
+        "options": {
+          "timeout": 90000
+        }
       },
-      "id": "parse-intent",
-      "name": "Parsear JSON IA",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3,
+      "id": "ollama-chat",
+      "name": "IA Local (Ollama)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
       "position": [
-        450,
+        500,
         300
       ]
     },
     {
       "parameters": {
-        "dataType": "string",
-        "value1": "={{ $json.content }}",
-        "rules": {
-          "rules": [
+        "mode": "runOnceForAllItems",
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst item = $input.all()[0].json;\nconst chatId = $node['Preparar Memoria (StaticData)'].json.chatId;\nconst responseText = item.message.content;\n\n// Guardar la respuesta de la IA en el historial (como un string JSON)\nif (staticData.chats && staticData.chats[chatId]) {\n  staticData.chats[chatId].push({ role: 'assistant', content: responseText });\n}\n\nlet parsed;\ntry {\n  parsed = JSON.parse(responseText);\n} catch(e) {\n  parsed = {\n    estado: 'pedir_datos',\n    mensaje_usuario: 'Tuve un pequeño problema técnico procesando tu mensaje. ¿Me lo repites por favor?',\n    datos: {}\n  };\n}\n\nreturn [{ json: {\n  chatId: chatId,\n  estado: parsed.estado || 'pedir_datos',\n  mensaje_usuario: parsed.mensaje_usuario || 'Procesado.',\n  datos: parsed.datos || {}\n}}];"
+      },
+      "id": "guardar-memoria",
+      "name": "Guardar Respuesta en Memoria",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
             {
-              "value2": "agendar_cita",
-              "outputKey": "Agendar"
-            },
-            {
-              "value2": "cancelar_cita",
-              "outputKey": "Cancelar"
+              "value1": "={{ $json.estado }}",
+              "value2": "ejecutar_reserva"
             }
           ]
         }
       },
-      "id": "switch-intent",
-      "name": "Decisor de Intención",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 2,
+      "id": "switch-estado",
+      "name": "¿Ejecutar o Hablar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
       "position": [
-        650,
+        1000,
         300
       ]
     },
     {
       "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.mensaje_usuario }}",
+        "additionalFields": {}
+      },
+      "id": "telegram-reply-chat",
+      "name": "Telegram Responder (Chat)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1250,
+        450
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
         "method": "POST",
-        "url": "http://fisio-backend:5000/api/webhooks/nueva-cita",
+        "url": "http://backend:5000/api/webhooks/nueva-cita",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -107,30 +138,8 @@
           ]
         },
         "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "cliente_nombre",
-              "value": "={{ JSON.parse($node['IA Local (Ollama)'].json.response).datos.nombre }}"
-            },
-            {
-              "name": "fecha",
-              "value": "={{ JSON.parse($node['IA Local (Ollama)'].json.response).datos.fecha }}"
-            },
-            {
-              "name": "hora",
-              "value": "={{ JSON.parse($node['IA Local (Ollama)'].json.response).datos.hora }}"
-            },
-            {
-              "name": "servicio",
-              "value": "={{ JSON.parse($node['IA Local (Ollama)'].json.response).datos.servicio }}"
-            },
-            {
-              "name": "telegram_id",
-              "value": "={{ $node['Telegram Trigger'].json.message.from.id }}"
-            }
-          ]
-        },
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"cliente_nombre\": \"{{ $json.datos.nombre || 'Sin nombre' }}\",\n  \"fecha\": \"{{ $json.datos.fecha }}\",\n  \"hora\": \"{{ $json.datos.hora }}\",\n  \"servicio\": \"{{ $json.datos.servicio }}\",\n  \"telegram_id\": \"{{ $json.chatId }}\"\n}",
         "options": {}
       },
       "id": "backend-book",
@@ -138,24 +147,26 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
       "position": [
-        900,
+        1250,
         150
       ]
     },
     {
       "parameters": {
         "calendar": "primary",
-        "start": "={{ $json.cita.fecha_hora }}",
-        "end": "={{ $json.cita.fecha_hora }}",
-        "title": "=Cita: {{$json.cliente.nombre}} - {{$json.cita.servicio_nombre}}",
-        "description": "Agendado vía Telegram"
+        "start": "={{ $json.datos.fecha + 'T' + $json.datos.hora + ':00' }}",
+        "end": "={{ $json.datos.fecha + 'T' + $json.datos.hora + ':00' }}",
+        "title": "=Cita Fisioterapia: {{ $json.datos.nombre }}",
+        "additionalFields": {
+          "description": "=Servicio: {{ $json.datos.servicio }}\nAgendado vía Telegram Bot"
+        }
       },
       "id": "google-calendar",
       "name": "Google Calendar (Crear Evento)",
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1,
       "position": [
-        1150,
+        1500,
         150
       ],
       "credentials": {
@@ -167,8 +178,8 @@
     },
     {
       "parameters": {
-        "chatId": "={{ $node['Telegram Trigger'].json.message.chat.id }}",
-        "text": "=¡Cita confirmada! Te esperamos el {{$node['Guardar en BD (Backend)'].json.cita.fecha_hora}}",
+        "chatId": "={{ $node['Guardar Respuesta en Memoria'].json.chatId }}",
+        "text": "=✅ ¡Tu cita ha sido guardada con éxito!\n\n📋 Servicio: {{ $node['Guardar Respuesta en Memoria'].json.datos.servicio }}\n👤 Nombre: {{ $node['Guardar Respuesta en Memoria'].json.datos.nombre }}\n📅 Fecha: {{ $node['Guardar Respuesta en Memoria'].json.datos.fecha }}\n🕐 Hora: {{ $node['Guardar Respuesta en Memoria'].json.datos.hora }}\n\n¡Te esperamos en Fisioterapeuta Li! 🏥",
         "additionalFields": {}
       },
       "id": "telegram-reply-success",
@@ -176,7 +187,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.1,
       "position": [
-        1400,
+        1750,
         150
       ],
       "credentials": {
@@ -190,15 +201,15 @@
       "parameters": {
         "resource": "message",
         "subject": "=Confirmación de Cita - Fisioterapeuta Li",
-        "message": "=Hola {{$json.cliente.nombre}}, tu cita ha sido confirmada.",
-        "to": "={{$json.cliente.email || 'correo@ejemplo.com'}}"
+        "message": "=Hola {{ $node['Guardar Respuesta en Memoria'].json.datos.nombre }},\n\nTu cita ha sido confirmada:\n📋 Servicio: {{ $node['Guardar Respuesta en Memoria'].json.datos.servicio }}\n📅 Fecha: {{ $node['Guardar Respuesta en Memoria'].json.datos.fecha }}\n🕐 Hora: {{ $node['Guardar Respuesta en Memoria'].json.datos.hora }}\n\n¡Te esperamos!\nFisioterapeuta Li",
+        "toList": "fisioterapeutali@gmail.com"
       },
       "id": "gmail-send",
       "name": "Gmail (Enviar Correo)",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1600,
+        2000,
         150
       ],
       "credentials": {
@@ -215,6 +226,17 @@
       "main": [
         [
           {
+            "node": "Preparar Memoria (StaticData)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Memoria (StaticData)": {
+      "main": [
+        [
+          {
             "node": "IA Local (Ollama)",
             "type": "main",
             "index": 0
@@ -226,25 +248,25 @@
       "main": [
         [
           {
-            "node": "Parsear JSON IA",
+            "node": "Guardar Respuesta en Memoria",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Parsear JSON IA": {
+    "Guardar Respuesta en Memoria": {
       "main": [
         [
           {
-            "node": "Decisor de Intención",
+            "node": "¿Ejecutar o Hablar?",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Decisor de Intención": {
+    "¿Ejecutar o Hablar?": {
       "main": [
         [
           {
@@ -253,7 +275,13 @@
             "index": 0
           }
         ],
-        []
+        [
+          {
+            "node": "Telegram Responder (Chat)",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Guardar en BD (Backend)": {
@@ -294,5 +322,5 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "f7ab0a72-7b56-4c4b-b0b4-9c4c781079d8"
+  "versionId": "v5-stateful-2026-08-31"
 }
