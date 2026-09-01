@@ -109,7 +109,8 @@ def calcular_disponibilidad(fecha, servicio_id):
         conflicto = False
 
         for cita in citas_existentes:
-            cita_inicio = cita.fecha_hora
+            # Asegurar que cita_inicio no tenga tzinfo para poder compararla con slot_actual
+            cita_inicio = cita.fecha_hora.replace(tzinfo=None) if cita.fecha_hora.tzinfo else cita.fecha_hora
             cita_duracion = timedelta(minutes=cita.servicio.duracion_min) if cita.servicio else timedelta(minutes=60)
             cita_fin = cita_inicio + cita_duracion + buffer
 

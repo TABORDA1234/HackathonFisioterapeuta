@@ -41,7 +41,7 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - NODE_ENV=production
-      - WEBHOOK_URL=https://cruz-cream-chorus-arabia.trycloudflare.com/
+      - WEBHOOK_URL=https://ali-administrator-event-architect.trycloudflare.com/
       - GENERIC_TIMEZONE=America/Bogota
     volumes:
       - n8n_data:/home/node/.n8n
