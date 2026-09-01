@@ -128,7 +128,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://backend:5000/api/webhooks/nueva-cita",
+        "url": "https://fisio-backend-s25s.onrender.com/api/webhooks/nueva-cita",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
