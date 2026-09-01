@@ -40,25 +40,4 @@ services:
     buildCommand: "cd SitioWeb && echo \"window.FISIO_API_URL = 'https://fisio-backend.onrender.com/api';\" > config.js && sed -i '1i<script src=\"config.js\"></script>' index.html"
     staticPublishPath: ./SitioWeb
 
-  # ── ORQUESTADOR (n8n) ──
-  - type: web
-    name: fisio-n8n
-    env: docker
-    dockerfilePath: ./Dockerfile.n8n
-    envVars:
-      - key: N8N_HOST
-        value: fisio-n8n.onrender.com
-      - key: N8N_PORT
-        value: "5678"
-      - key: N8N_PROTOCOL
-        value: https
-      - key: NODE_ENV
-        value: production
-      - key: WEBHOOK_URL
-        value: https://fisio-n8n.onrender.com/
-      - key: GENERIC_TIMEZONE
-        value: America/Bogota
-    disk:
-      name: n8n-data
-      mountPath: /home/node/.n8n
-      sizeGB: 1
+
