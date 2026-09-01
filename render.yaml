@@ -3,6 +3,7 @@ services:
   - type: web
     name: fisio-backend
     env: python
+    plan: free
     buildCommand: "cd Backend && pip install -r requirements.txt"
     startCommand: "cd Backend && gunicorn app:app --bind 0.0.0.0:$PORT"
     envVars:
