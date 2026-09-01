@@ -1,0 +1,114 @@
+{
+  "name": "Fisioterapeuta Li - Bot Principal",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "id": "1",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fisio-backend:5000/api/webhooks/log",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "cambiar-esto-por-una-api-key-segura"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "accion",
+              "value": "Mensaje Recibido de Telegram"
+            },
+            {
+              "name": "origen",
+              "value": "Telegram"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2",
+      "name": "Log en Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.message.chat.id}}",
+        "text": "¡Hola! Soy tu asistente de Fisioterapeuta Li. Por ahora estoy en construcción, pero mi API del Backend ya está lista para guardar todo lo que hagamos.",
+        "additionalFields": {}
+      },
+      "id": "3",
+      "name": "Telegram Responder",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log en Backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log en Backend": {
+      "main": [
+        [
+          {
+            "node": "Telegram Responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f7ab0a72-7b56-4c4b-b0b4-9c4c781079d8"
+}

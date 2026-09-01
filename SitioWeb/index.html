@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fisioterapeuta Li | Reservas Online</title>
+    <meta name="description" content="Agenda tu cita de fisioterapia con Li. Servicios profesionales de rehabilitación y bienestar.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <span class="logo-icon">🌿</span>
+                <h1>Fisioterapeuta Li</h1>
+            </div>
+            <nav class="nav">
+                <a href="#servicios">Servicios</a>
+                <a href="#reservar" class="btn btn-primary">Agendar Cita</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h2>Recupera tu movilidad,<br> mejora tu vida.</h2>
+            <p>Tratamientos personalizados de fisioterapia para aliviar el dolor y prevenir lesiones.</p>
+            <a href="#reservar" class="btn btn-large">Ver Horarios Disponibles</a>
+        </div>
+    </section>
+
+    <!-- Servicios -->
+    <section id="servicios" class="servicios-section section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Nuestros Servicios</h2>
+                <p>Elige el tratamiento que mejor se adapte a tus necesidades.</p>
+            </div>
+            
+            <div id="servicios-grid" class="servicios-grid">
+                <!-- Se llenará dinámicamente con JS -->
+                <div class="loading">Cargando servicios...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reservas -->
+    <section id="reservar" class="reserva-section section">
+        <div class="container">
+            <div class="reserva-card">
+                <div class="section-header text-left">
+                    <h2>Agenda tu Cita</h2>
+                    <p>Selecciona un servicio y busca los horarios disponibles.</p>
+                </div>
+                
+                <form id="reserva-form" class="reserva-form">
+                    
+                    <!-- Paso 1: Servicio y Fecha -->
+                    <div class="form-group">
+                        <label for="servicio-select">Servicio</label>
+                        <select id="servicio-select" required>
+                            <option value="">Selecciona un servicio...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha-input">Fecha</label>
+                        <input type="date" id="fecha-input" required>
+                    </div>
+
+                    <button type="button" id="btn-buscar" class="btn btn-secondary w-full">Buscar Disponibilidad</button>
+
+                    <!-- Paso 2: Horarios -->
+                    <div id="horarios-container" class="horarios-container hidden">
+                        <label>Horarios Disponibles</label>
+                        <div id="horarios-grid" class="horarios-grid">
+                            <!-- Botones de horarios dinámicos -->
+                        </div>
+                        <p id="horarios-msg" class="horarios-msg"></p>
+                    </div>
+
+                    <!-- Paso 3: Datos del paciente -->
+                    <div id="datos-paciente" class="datos-paciente hidden">
+                        <h3>Datos del Paciente</h3>
+                        <div class="form-group">
+                            <label for="nombre-input">Nombre Completo</label>
+                            <input type="text" id="nombre-input" placeholder="Ej. Ana Pérez" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono-input">Teléfono</label>
+                            <input type="tel" id="telefono-input" placeholder="Ej. +57 300 000 0000" required>
+                        </div>
+                        
+                        <input type="hidden" id="hora-seleccionada">
+                        
+                        <button type="submit" id="btn-confirmar" class="btn btn-primary w-full mt-4">Confirmar Reserva</button>
+                    </div>
+                </form>
+
+                <!-- Mensaje de éxito -->
+                <div id="mensaje-exito" class="mensaje-exito hidden">
+                    <div class="icon-success">✓</div>
+                    <h3>¡Cita Confirmada!</h3>
+                    <p>Tu cita ha sido agendada con éxito. Te esperamos.</p>
+                    <button id="btn-nueva-cita" class="btn btn-secondary mt-4">Agendar otra cita</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Fisioterapeuta Li - HackTech 5.0. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>

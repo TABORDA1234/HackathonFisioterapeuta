@@ -1,0 +1,24 @@
+# Core
+Flask==3.1.*
+Flask-SQLAlchemy==3.1.*
+Flask-Migrate==4.0.*
+Flask-Cors==5.0.*
+Flask-Limiter==3.8.*
+
+# Serialización y validación
+marshmallow==3.23.*
+flask-marshmallow==1.2.*
+marshmallow-sqlalchemy==1.1.*
+
+# Auth
+PyJWT==2.9.*
+bcrypt==4.2.*
+
+# Base de datos
+psycopg2-binary==2.9.*
+
+# Configuración
+python-dotenv==1.0.*
+
+# Servidor de producción
+gunicorn==23.0.*
