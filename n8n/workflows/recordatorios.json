@@ -1,0 +1,152 @@
+{
+  "name": "FisioLi - Recordatorios (24h antes)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "cron-recordatorios",
+      "name": "Todos los días a las 8 AM",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://fisio-backend:5000/api/webhooks/consultar-agenda?fecha={{ $today.plus(1, 'day').toFormat('yyyy-MM-dd') }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "cambiar-esto-por-una-api-key-segura"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-agenda-manana",
+      "name": "Obtener citas de mañana",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        350,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "citas",
+        "options": {}
+      },
+      "id": "split-citas-manana",
+      "name": "Separar Citas",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 2.1,
+      "position": [
+        550,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.cliente_telegram_id || 'ID_DEFAULT' }}",
+        "text": "=Hola {{$json.cliente_nombre}}, recuerda que mañana a las {{$json.fecha_hora.split('T')[1]}} tienes tu sesión de {{$json.servicio_nombre}} con Fisioterapeuta Li. ¡Te esperamos!",
+        "additionalFields": {}
+      },
+      "id": "telegram-recordatorio",
+      "name": "Telegram (Recordatorio)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "subject": "=Recordatorio de Cita Mañana - FisioLi",
+        "message": "=Hola {{$json.cliente_nombre}},\n\nEste es un recordatorio de tu cita programada para mañana a las {{$json.fecha_hora.split('T')[1]}}.\n\nPor favor, responde este correo o avísanos por Telegram si necesitas reprogramar.\n\nAtentamente,\nFisioterapeuta Li",
+        "to": "={{ $json.cliente_email || 'correo@ejemplo.com' }}"
+      },
+      "id": "gmail-recordatorio",
+      "name": "Gmail (Recordatorio)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Todos los días a las 8 AM": {
+      "main": [
+        [
+          {
+            "node": "Obtener citas de mañana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener citas de mañana": {
+      "main": [
+        [
+          {
+            "node": "Separar Citas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar Citas": {
+      "main": [
+        [
+          {
+            "node": "Telegram (Recordatorio)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail (Recordatorio)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c2c8d2b9-0e52-5d8c-c1c5-0d5d8e2180e9"
+}

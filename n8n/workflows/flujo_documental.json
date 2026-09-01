@@ -1,0 +1,171 @@
+{
+  "name": "FisioLi - Gestión Documental (Google Drive + Sheets)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 20 * * *"
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Cron (Todos los días a las 8 PM)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://fisio-backend:5000/api/webhooks/consultar-agenda",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "cambiar-esto-por-una-api-key-segura"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-backend",
+      "name": "Consultar Backend (Citas del Día)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        350,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "citas",
+        "options": {}
+      },
+      "id": "split-items",
+      "name": "Separar Citas",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 2.1,
+      "position": [
+        550,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "name": "={{ $json.cliente_nombre }} - {{ $json.fecha_hora.split('T')[0] }}",
+        "options": {}
+      },
+      "id": "drive-folder",
+      "name": "Google Drive (Crear Carpeta)",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        800,
+        200
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "pegar_id_del_sheet_aqui",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja 1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $json.fecha_hora.split('T')[0] }}",
+            "Hora": "={{ $json.fecha_hora.split('T')[1] }}",
+            "Paciente": "={{ $json.cliente_nombre }}",
+            "Servicio": "={{ $json.servicio_nombre }}",
+            "Estado": "={{ $json.estado }}"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "sheets-append",
+      "name": "Google Sheets (Reporte)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        800,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cron (Todos los días a las 8 PM)": {
+      "main": [
+        [
+          {
+            "node": "Consultar Backend (Citas del Día)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Backend (Citas del Día)": {
+      "main": [
+        [
+          {
+            "node": "Separar Citas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar Citas": {
+      "main": [
+        [
+          {
+            "node": "Google Drive (Crear Carpeta)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets (Reporte)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b1b7c1a8-9d41-4c7b-b0b4-9c4c781079d8"
+}

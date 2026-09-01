@@ -1,0 +1,21 @@
+# ─────────────────────────────────────────────
+# Fisioterapeuta Li — Docker Compose
+# Backend API (Conectado a Supabase)
+# ─────────────────────────────────────────────
+
+services:
+  # ── Backend API Flask ──
+  api:
+    build: .
+    container_name: fisio_api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      FLASK_ENV: development
+    volumes:
+      - .:/app  # Hot reload en desarrollo
+    command: >
+      python app.py
