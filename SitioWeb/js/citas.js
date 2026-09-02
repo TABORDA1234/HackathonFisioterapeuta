@@ -21,22 +21,7 @@ document.getElementById('btn-logout')?.addEventListener('click', () => Auth.logo
 let currentDate = new Date();
 let citasCache = [];
 
-// Demo data
-const DEMO_CITAS = [
-  { id:1, cliente_nombre:'Carlos Rodríguez', cliente_telefono:'3101234567', fecha_hora: getDemoDate(1, '09:00'), servicio_nombre:'Valoración Inicial', sede:'tunja', estado:'pending' },
-  { id:2, cliente_nombre:'María Gómez',      cliente_telefono:'3209876543', fecha_hora: getDemoDate(1, '10:00'), servicio_nombre:'Rehabilitación Física', sede:'tunja', estado:'confirmed' },
-  { id:3, cliente_nombre:'Juan Pérez',       cliente_telefono:'3154445566', fecha_hora: getDemoDate(2, '14:00'), servicio_nombre:'Punción Seca', sede:'tunja', estado:'confirmed' },
-  { id:4, cliente_nombre:'Ana Torres',       cliente_telefono:'3173334444', fecha_hora: getDemoDate(2, '16:00'), servicio_nombre:'Cuerpo Completo', sede:'tunja', estado:'cancelled' },
-  { id:5, cliente_nombre:'Luis Mora',        cliente_telefono:'3126667777', fecha_hora: getDemoDate(5, '08:00'), servicio_nombre:'Terapia Neural', sede:'turmeque', estado:'confirmed' },
-];
-
-function getDemoDate(offsetDays, timeStr) {
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
-  return `${d.toISOString().split('T')[0]}T${timeStr}:00`;
-}
-
-let usandoDemo = false;
+// No demo data - we enforce real backend data
 
 // ── Renderizado del Grid Semanal ──
 const HORAS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
@@ -191,11 +176,10 @@ async function cargarCitas() {
 
   try {
     const res = await CitasAPI.list({ fecha_inicio: inicio, fecha_fin: fin });
-    usandoDemo = false;
     citasCache = res.citas || [];
-  } catch {
-    usandoDemo = true;
-    citasCache = [...DEMO_CITAS];
+  } catch (e) {
+    console.error("Error al cargar citas:", e);
+    citasCache = [];
   }
   renderGridSemanal();
 }
@@ -275,13 +259,8 @@ document.getElementById('modal-cita-save').addEventListener('click', async () =>
   };
 
   try {
-    if (usandoDemo) {
-      DEMO_CITAS.push({ id: Date.now(), ...data });
-      Toast.success('Cita guardada en demo.');
-    } else {
-      await CitasAPI.create(data);
-      Toast.success('Cita agendada.');
-    }
+    await CitasAPI.create(data);
+    Toast.success('Cita agendada correctamente.');
     cerrarModales();
     cargarCitas();
   } catch (e) {
@@ -340,14 +319,8 @@ window.abrirDetalleCita = function(id) {
 async function cambiarEstadoCita(nuevoEstado) {
   if (!citaActiva) return;
   try {
-    if (usandoDemo) {
-      const idx = DEMO_CITAS.findIndex(c => c.id === citaActiva.id);
-      if (idx > -1) DEMO_CITAS[idx].estado = nuevoEstado;
-      Toast.success('Estado actualizado (Demo).');
-    } else {
-      await CitasAPI.update(citaActiva.id, { estado: nuevoEstado });
-      Toast.success('Estado de la cita actualizado.');
-    }
+    await CitasAPI.update(citaActiva.id, { estado: nuevoEstado });
+    Toast.success('Estado de la cita actualizado.');
     cerrarModales();
     cargarCitas();
   } catch (e) {

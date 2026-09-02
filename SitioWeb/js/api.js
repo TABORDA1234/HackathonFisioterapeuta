@@ -3,7 +3,7 @@
    Manejo de peticiones HTTP al backend Flask
    =================================================== */
 
-const API_BASE = 'https://fisio-backend-s25s.onrender.com/api';
+const API_BASE = 'http://localhost:5000/api';
 
 /**
  * Cliente HTTP centralizado con manejo de errores y JWT
@@ -106,11 +106,23 @@ const CitasAPI = {
 
 const ServiciosAPI = {
   list: () => api.get('/servicios'),
+  create: (data) => api.post('/servicios', data),
+  update: (id, data) => api.put(`/servicios/${id}`, data),
+  delete: (id) => api.delete(`/servicios/${id}`),
+};
+
+const UsuariosAPI = {
+  list: () => api.get('/usuarios'),
+  get: (id) => api.get(`/usuarios/${id}`),
+  create: (data) => api.post('/usuarios', data),
+  update: (id, data) => api.put(`/usuarios/${id}`, data),
+  delete: (id) => api.delete(`/usuarios/${id}`),
 };
 
 const AdminAPI = {
   resumen: () => api.get('/admin/resumen'),
   citasHoy: () => api.get('/admin/citas-hoy'),
+  logs: (params) => api.get('/admin/logs', params),
 };
 
 /* ── Toast system ── */
@@ -243,6 +255,7 @@ window.AuthAPI = AuthAPI;
 window.ClientesAPI = ClientesAPI;
 window.CitasAPI = CitasAPI;
 window.ServiciosAPI = ServiciosAPI;
+window.UsuariosAPI = UsuariosAPI;
 window.AdminAPI = AdminAPI;
 window.Toast = Toast;
 window.Utils = Utils;

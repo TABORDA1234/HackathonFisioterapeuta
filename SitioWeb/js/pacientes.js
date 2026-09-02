@@ -22,19 +22,7 @@ let currentPage = 1;
 let currentSearch = '';
 let editingId = null;
 
-// Demo data fallback
-const DEMO_PACIENTES = [
-  { id:1, nombre:'Carlos Rodríguez', telefono:'3101234567', email:'carlos@mail.com', activo:true, created_at:'2026-08-30', notas_medicas: null },
-  { id:2, nombre:'María Gómez',      telefono:'3209876543', email:'maria@mail.com',  activo:true, created_at:'2026-08-29', notas_medicas: null },
-  { id:3, nombre:'Juan Pérez',       telefono:'3154445566', email:'',               activo:true, created_at:'2026-08-28', notas_medicas: null },
-  { id:4, nombre:'Ana Torres',       telefono:'3173334444', email:'ana@mail.com',   activo:true, created_at:'2026-08-27', notas_medicas: null },
-  { id:5, nombre:'Luis Mora',        telefono:'3126667777', email:'',               activo:true, created_at:'2026-08-26', notas_medicas: null },
-  { id:6, nombre:'Sara Niño',        telefono:'3185559999', email:'sara@mail.com',  activo:true, created_at:'2026-08-25', notas_medicas: null },
-  { id:7, nombre:'Diego Castro',     telefono:'3162223333', email:'',               activo:true, created_at:'2026-08-24', notas_medicas: null },
-];
-
-let demoData = [...DEMO_PACIENTES];
-let usandoDemo = false;
+// No demo data - we enforce real backend data
 
 /** Renderizar tabla */
 function renderTabla(pacientes, total) {
@@ -115,22 +103,15 @@ window.cargarPagina = function(p) {
   cargarPacientes();
 };
 
-/** Cargar pacientes desde el backend o demo */
+/** Cargar pacientes desde el backend */
 async function cargarPacientes() {
   try {
     const res = await ClientesAPI.list({ page: currentPage, per_page: 10, buscar: currentSearch });
-    usandoDemo = false;
     renderTabla(res.clientes || [], res.total || 0);
     renderPaginacion(res.pagina || 1, res.paginas || 1);
-  } catch {
-    usandoDemo = true;
-    // Filtrar demo
-    const filtrados = demoData.filter(p =>
-      p.nombre.toLowerCase().includes(currentSearch.toLowerCase()) ||
-      (p.telefono && p.telefono.includes(currentSearch)) ||
-      (p.email && p.email.toLowerCase().includes(currentSearch.toLowerCase()))
-    );
-    renderTabla(filtrados, filtrados.length);
+  } catch (error) {
+    console.error("Error al cargar pacientes:", error);
+    renderTabla([], 0);
     renderPaginacion(1, 1);
   }
 }
@@ -162,8 +143,8 @@ modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); }
 
 /** Editar paciente */
 window.editarPaciente = function(id) {
-  const p = usandoDemo ? demoData.find(x => x.id === id) : null;
-  if (p) {
+  ClientesAPI.get(id).then(res => {
+    const p = res.cliente;
     editingId = id;
     document.getElementById('modal-title').textContent = 'Editar Paciente';
     document.getElementById('p-nombre').value   = p.nombre || '';
@@ -172,35 +153,16 @@ window.editarPaciente = function(id) {
     document.getElementById('p-telegram').value = p.telegram_id || '';
     document.getElementById('p-notas').value    = p.notas_medicas || '';
     openModal();
-  } else {
-    // Intentar con backend
-    ClientesAPI.get(id).then(res => {
-      const p = res.cliente;
-      editingId = id;
-      document.getElementById('modal-title').textContent = 'Editar Paciente';
-      document.getElementById('p-nombre').value   = p.nombre || '';
-      document.getElementById('p-telefono').value = p.telefono || '';
-      document.getElementById('p-email').value    = p.email || '';
-      document.getElementById('p-telegram').value = p.telegram_id || '';
-      document.getElementById('p-notas').value    = p.notas_medicas || '';
-      openModal();
-    }).catch(() => Toast.error('No se pudo cargar el paciente.'));
-  }
+  }).catch(() => Toast.error('No se pudo cargar el paciente.'));
 };
 
 /** Eliminar paciente */
 window.eliminarPaciente = function(id, nombre) {
   if (!confirm(`¿Eliminar al paciente "${nombre}"? Esta acción no se puede deshacer.`)) return;
-  if (usandoDemo) {
-    demoData = demoData.filter(p => p.id !== id);
-    Toast.success('Paciente eliminado.');
+  ClientesAPI.delete(id).then(() => {
+    Toast.success('Paciente eliminado correctamente.');
     cargarPacientes();
-  } else {
-    ClientesAPI.delete(id).then(() => {
-      Toast.success('Paciente eliminado correctamente.');
-      cargarPacientes();
-    }).catch(e => Toast.error(e.message));
-  }
+  }).catch(e => Toast.error(e.message));
 };
 
 /** Guardar paciente (crear o editar) */
@@ -217,23 +179,13 @@ document.getElementById('modal-save').addEventListener('click', async () => {
   Utils.setLoading(btn, true);
 
   try {
-    if (usandoDemo) {
-      if (editingId) {
-        const idx = demoData.findIndex(p => p.id === editingId);
-        if (idx >= 0) demoData[idx] = { ...demoData[idx], nombre, telefono, email, telegram_id: telegram, notas_medicas: notas };
-      } else {
-        demoData.unshift({ id: Date.now(), nombre, telefono, email, telegram_id: telegram, notas_medicas: notas, activo: true, created_at: new Date().toISOString() });
-      }
-      Toast.success(editingId ? 'Paciente actualizado.' : 'Paciente creado exitosamente.');
+    const data = { nombre, telefono, email, telegram_id: telegram || undefined, notas_medicas: notas || undefined };
+    if (editingId) {
+      await ClientesAPI.update(editingId, data);
+      Toast.success('Paciente actualizado correctamente.');
     } else {
-      const data = { nombre, telefono, email, telegram_id: telegram || undefined, notas_medicas: notas || undefined };
-      if (editingId) {
-        await ClientesAPI.update(editingId, data);
-        Toast.success('Paciente actualizado correctamente.');
-      } else {
-        await ClientesAPI.create(data);
-        Toast.success('Paciente creado exitosamente.');
-      }
+      await ClientesAPI.create(data);
+      Toast.success('Paciente creado exitosamente.');
     }
     closeModal();
     cargarPacientes();

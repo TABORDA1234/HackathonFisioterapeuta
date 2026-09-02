@@ -14,15 +14,18 @@
 .sidebar {
   width: var(--sidebar-width);
   min-height: 100vh;
-  background: var(--color-bg-2);
-  border-right: 1px solid var(--color-border);
+  background: rgba(248, 243, 233, 0.85); /* Glassmorphism background */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(239, 229, 208, 0.6);
   display: flex;
   flex-direction: column;
   position: fixed;
   left: 0; top: 0; bottom: 0;
   z-index: 100;
-  transition: transform var(--transition-base);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
   overflow-y: auto;
+  box-shadow: 4px 0 24px rgba(13, 115, 119, 0.03);
 }
 
 .sidebar-brand {
@@ -75,32 +78,35 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  padding: 10px var(--space-md);
+  padding: 12px var(--space-md);
   border-radius: var(--radius-md);
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   text-decoration: none;
   position: relative;
+  overflow: hidden;
 }
 .nav-item:hover {
-  background: rgba(255,255,255,0.04);
-  color: var(--color-text);
+  background: rgba(13, 148, 136, 0.06);
+  color: var(--color-teal);
+  transform: translateX(4px);
 }
 .nav-item.active {
-  background: var(--color-teal-subtle);
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.15) 0%, rgba(13, 148, 136, 0.05) 100%);
   color: var(--color-teal);
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), 0 2px 10px rgba(13,148,136,0.1);
 }
 .nav-item.active::before {
   content: '';
   position: absolute;
-  left: 0; top: 25%; bottom: 25%;
-  width: 3px;
-  background: var(--color-teal);
-  border-radius: 0 2px 2px 0;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(to bottom, var(--color-teal), #3B9EFF);
+  border-radius: 0 4px 4px 0;
 }
 .nav-item-icon {
   width: 20px;
@@ -161,9 +167,10 @@
 /* ── Admin Topbar ── */
 .admin-topbar {
   height: var(--header-height);
-  background: rgba(6,13,26,0.95);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-border);
+  background: rgba(253, 251, 247, 0.85); /* Match site bg with glassmorphism */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(239, 229, 208, 0.5);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -171,6 +178,7 @@
   position: sticky;
   top: 0;
   z-index: 50;
+  box-shadow: 0 4px 20px rgba(13, 115, 119, 0.02);
 }
 
 .topbar-left {
@@ -412,29 +420,47 @@
   width: 100%;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   background: linear-gradient(180deg, var(--color-teal), var(--color-teal-dark));
-  transition: height var(--transition-slow);
+  transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s ease, filter 0.3s ease;
   min-height: 4px;
   position: relative;
   cursor: pointer;
+  box-shadow: 0 4px 10px rgba(13, 148, 136, 0.3);
 }
-.chart-bar:hover { opacity: 0.85; }
+.chart-bar:hover { 
+  transform: translateY(-4px);
+  filter: brightness(1.2);
+  box-shadow: 0 8px 16px rgba(13, 148, 136, 0.4);
+}
 .chart-bar-tooltip {
   position: absolute;
-  bottom: calc(100% + 6px);
+  bottom: calc(100% + 10px);
   left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-bg-2);
-  border: 1px solid var(--color-border);
+  transform: translateX(-50%) translateY(10px);
+  background: var(--ink-900);
+  color: #fff;
   border-radius: var(--radius-sm);
-  padding: 3px 8px;
-  font-size: 0.72rem;
+  padding: 6px 10px;
+  font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-.chart-bar:hover .chart-bar-tooltip { opacity: 1; }
+.chart-bar-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px;
+  border-style: solid;
+  border-color: var(--ink-900) transparent transparent transparent;
+}
+.chart-bar:hover .chart-bar-tooltip { 
+  opacity: 1; 
+  transform: translateX(-50%) translateY(0);
+}
 
 .chart-label {
   font-size: 0.68rem;

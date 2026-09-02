@@ -28,36 +28,7 @@ overlay.addEventListener('click', () => {
 // Logout
 document.getElementById('btn-logout')?.addEventListener('click', () => Auth.logout());
 
-// ── Datos de demo para cuando el backend no esté disponible
-const DEMO = {
-  pacientes: 47,
-  citasHoy: 8,
-  pendientes: 3,
-  ingresos: 2850000,
-  agendaHoy: [
-    { hora: '07:00', nombre: 'Carlos Rodríguez', servicio: 'Rehabilitación Física', estado: 'confirmed' },
-    { hora: '08:00', nombre: 'María Gómez',      servicio: 'Prescripción de Ejercicio', estado: 'confirmed' },
-    { hora: '09:00', nombre: 'Juan Pérez',        servicio: 'Punción Seca', estado: 'pending' },
-    { hora: '10:00', nombre: 'Ana Torres',         servicio: 'Cuerpo Completo', estado: 'confirmed' },
-    { hora: '14:00', nombre: 'Luis Mora',          servicio: 'Terapia Neural', estado: 'confirmed' },
-    { hora: '15:00', nombre: 'Sara Niño',          servicio: 'Valoración Inicial', estado: 'pending' },
-    { hora: '16:00', nombre: 'Diego Castro',       servicio: 'PRP', estado: 'confirmed' },
-    { hora: '17:00', nombre: 'Paula Vargas',       servicio: 'Rehabilitación Física', estado: 'confirmed' },
-  ],
-  pacientesRecientes: [
-    { id:1, nombre:'Carlos Rodríguez', telefono:'3101234567', email:'carlos@mail.com', created_at:'2026-08-30' },
-    { id:2, nombre:'María Gómez',      telefono:'3209876543', email:'maria@mail.com',  created_at:'2026-08-29' },
-    { id:3, nombre:'Juan Pérez',       telefono:'3154445566', email:'',               created_at:'2026-08-28' },
-    { id:4, nombre:'Ana Torres',       telefono:'3173334444', email:'ana@mail.com',   created_at:'2026-08-27' },
-    { id:5, nombre:'Luis Mora',        telefono:'3126667777', email:'',               created_at:'2026-08-26' },
-  ],
-  citasSemana: [
-    { semana: 'S1', total: 12 }, { semana: 'S2', total: 18 }, { semana: 'S3', total: 9  },
-    { semana: 'S4', total: 22 }, { semana: 'S5', total: 15 }, { semana: 'S6', total: 27 },
-    { semana: 'S7', total: 8  },
-  ],
-};
-
+// DEMO DATA REMOVED - using real backend data only
 /** Rellena KPIs */
 function renderKPIs(data) {
   document.getElementById('kpi-pacientes').textContent = data.pacientes;
@@ -143,7 +114,7 @@ function renderTabla(pacientes) {
     </table>`;
 }
 
-/** Cargar datos del backend o usar demo */
+/** Cargar datos del backend */
 async function loadDashboard() {
   try {
     const [resumen, pacientes] = await Promise.all([
@@ -151,26 +122,32 @@ async function loadDashboard() {
       ClientesAPI.list({ per_page: 5 }),
     ]);
     renderKPIs({
-      pacientes: resumen.total_pacientes ?? DEMO.pacientes,
-      citasHoy:  resumen.citas_hoy ?? DEMO.citasHoy,
-      pendientes: resumen.pendientes ?? DEMO.pendientes,
-      ingresos:  resumen.ingresos_mes ?? DEMO.ingresos,
+      pacientes: resumen.total_pacientes ?? 0,
+      citasHoy:  resumen.citas_hoy ?? 0,
+      pendientes: resumen.pendientes ?? 0,
+      ingresos:  resumen.ingresos_mes ?? 0,
     });
-    renderTabla(pacientes.clientes || DEMO.pacientesRecientes);
-  } catch {
-    // Backend no disponible → usar datos demo
-    renderKPIs(DEMO);
-    renderTabla(DEMO.pacientesRecientes);
+    renderTabla(pacientes.clientes || []);
+  } catch (error) {
+    console.error("Error cargando dashboard:", error);
+    renderKPIs({ pacientes: 0, citasHoy: 0, pendientes: 0, ingresos: 0 });
+    renderTabla([]);
   }
 
   try {
     const citasHoy = await AdminAPI.citasHoy();
-    renderAgenda(citasHoy.citas || DEMO.agendaHoy);
+    renderAgenda(citasHoy.citas || []);
   } catch {
-    renderAgenda(DEMO.agendaHoy);
+    renderAgenda([]);
   }
 
-  renderChart(DEMO.citasSemana);
+  try {
+    // Para simplificar, obtenemos la gráfica del resumen si está disponible
+    const resumen = await AdminAPI.resumen();
+    renderChart(resumen.citasSemana || []);
+  } catch {
+    renderChart([]);
+  }
 }
 
 loadDashboard();

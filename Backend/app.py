@@ -37,6 +37,7 @@ def create_app(config_name=None):
     from routes.webhooks import webhooks_bp
     from routes.admin import admin_bp
     from routes.health import health_bp
+    from routes.usuarios import usuarios_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(clientes_bp)
@@ -45,6 +46,7 @@ def create_app(config_name=None):
     app.register_blueprint(webhooks_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(health_bp)
+    app.register_blueprint(usuarios_bp)
 
     # ── Manejo global de errores ──
     @app.errorhandler(404)
@@ -78,6 +80,7 @@ def create_app(config_name=None):
                 "disponibilidad": "/api/citas/disponibilidad",
                 "webhooks": "/api/webhooks",
                 "admin": "/api/admin",
+                "usuarios": "/api/usuarios",
                 "health": "/api/health",
             },
         })

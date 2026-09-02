@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pacientes — Panel Admin · La Fisioterapeuta Li</title>
+  <title>Auditorías — Panel Admin · La Fisioterapeuta Li</title>
   <meta name="robots" content="noindex" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="../css/main.css" />
@@ -13,6 +13,7 @@
 <body>
 <div class="admin-layout">
 
+  <!-- ── Sidebar ── -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-brand-icon">
@@ -32,7 +33,7 @@
         <span class="nav-item-icon">📅</span> Agenda & Citas
       </a>
       <div class="nav-section-title">Pacientes</div>
-      <a href="pacientes.html" class="nav-item active">
+      <a href="pacientes.html" class="nav-item">
         <span class="nav-item-icon">👥</span> Pacientes
       </a>
       <a href="historia-clinica.html" class="nav-item">
@@ -45,7 +46,7 @@
       <a href="usuarios.html" class="nav-item">
         <span class="nav-item-icon">🛡️</span> Usuarios (Admins)
       </a>
-      <a href="auditorias.html" class="nav-item">
+      <a href="auditorias.html" class="nav-item active">
         <span class="nav-item-icon">🔍</span> Auditorías
       </a>
       <div class="nav-section-title">Sistema</div>
@@ -68,89 +69,73 @@
   </aside>
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
+  <!-- ── Main ── -->
   <div class="admin-main">
     <header class="admin-topbar">
       <div class="topbar-left">
         <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
         <div>
-          <div class="topbar-title">Pacientes</div>
-          <div class="topbar-breadcrumb">Gestión de pacientes</div>
+          <div class="topbar-title">Logs de Operaciones</div>
+          <div class="topbar-breadcrumb">Gestión de Logs de Operaciones</div>
         </div>
       </div>
       <div class="topbar-right">
-        <button class="btn btn-primary btn-sm" id="btn-nuevo-paciente">+ Nuevo Paciente</button>
+        <div class="topbar-date" id="topbar-date">📅 —</div>
+        <a href="../reservas.html" target="_blank" class="btn btn-primary btn-sm">+ Nueva Reserva</a>
       </div>
     </header>
 
     <main class="admin-content">
 
-      <!-- Búsqueda y filtros -->
-      <div class="card" style="margin-bottom:var(--space-xl);">
-        <div style="display:flex; gap:var(--space-md); flex-wrap:wrap; align-items:center;">
-          <div class="search-bar" style="flex:1; min-width:240px;">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="search-input" placeholder="Buscar por nombre, teléfono o correo…" />
+      <div class="card">
+        <div class="card-header" style="flex-direction:column; align-items:flex-start; gap:15px;">
+          <div style="display:flex; justify-content:space-between; width:100%;">
+            <span class="card-title">🔍 Registro de Auditorías y Operaciones</span>
+            <button class="btn btn-ghost btn-sm" id="btn-refresh" title="Actualizar">🔄</button>
           </div>
-          <div style="display:flex; gap:var(--space-sm); align-items:center;">
-            <span class="badge badge-neutral" id="badge-total">— pacientes</span>
+          <div class="grid grid-3 gap-sm" style="width:100%;">
+            <input type="text" class="input" id="filter-accion" placeholder="Filtrar por Acción (ej. crear_cita)">
+            <select class="input" id="filter-origen">
+              <option value="">Todos los Orígenes</option>
+              <option value="web_admin">Panel Administrativo</option>
+              <option value="n8n">n8n (Asistente IA)</option>
+              <option value="telegram">Telegram Directo</option>
+            </select>
+            <button class="btn btn-primary" id="btn-filtrar">Buscar</button>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="table" id="tabla-logs">
+            <thead>
+              <tr>
+                <th>Fecha y Hora</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Entidad</th>
+                <th>Origen</th>
+                <th>Detalle</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="6" class="text-center">Cargando registros...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer" style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="text-light text-sm" id="log-pagination-info">Mostrando página 1</span>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-ghost btn-sm" id="btn-prev" disabled>Anterior</button>
+            <button class="btn btn-ghost btn-sm" id="btn-next">Siguiente</button>
           </div>
         </div>
       </div>
 
-      <!-- Tabla de pacientes -->
-      <div class="card" style="padding:0; overflow:hidden;">
-        <div class="table-container" id="tabla-pacientes">
-          <div class="empty-state"><div class="spinner" style="margin:0 auto;"></div><div class="empty-state-title" style="margin-top:var(--space-md);">Cargando pacientes…</div></div>
-        </div>
-        <div id="paginacion" style="padding:var(--space-md);"></div>
-      </div>
-
-    </main>
-  </div>
-</div>
-
-<!-- ── Modal Nuevo Paciente ── -->
-<div class="modal-overlay hidden" id="modal-paciente">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-title">Nuevo Paciente</div>
-      <button class="modal-close" id="modal-close">✕</button>
-    </div>
-    <form id="form-paciente" novalidate>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="p-nombre">Nombre completo <span class="required">*</span></label>
-          <input type="text" class="form-control" id="p-nombre" placeholder="Nombre completo" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="p-telefono">Teléfono / WhatsApp</label>
-          <input type="tel" class="form-control" id="p-telefono" placeholder="3XXXXXXXXX" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" for="p-email">Correo electrónico</label>
-          <input type="email" class="form-control" id="p-email" placeholder="correo@ejemplo.com" />
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="p-telegram">ID de Telegram</label>
-          <input type="text" class="form-control" id="p-telegram" placeholder="Opcional" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="p-notas">Notas médicas iniciales</label>
-        <textarea class="form-control" id="p-notas" rows="3" placeholder="Observaciones iniciales…"></textarea>
-      </div>
-    </form>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" id="modal-cancel">Cancelar</button>
-      <button class="btn btn-primary" id="modal-save">Guardar Paciente</button>
-    </div>
+</main>
   </div>
 </div>
 
 <script src="../js/api.js"></script>
 <script src="../js/auth.js"></script>
-<script src="../js/pacientes.js"></script>
+<script src="../js/admin-auditorias.js"></script>
 </body>
 </html>
