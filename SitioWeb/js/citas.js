@@ -144,7 +144,7 @@ window.seleccionarDia = function(isoStr) {
   const container = document.getElementById('lista-dia');
 
   if (citasDelDia.length === 0) {
-    container.innerHTML = '<div class="empty-state" style="padding:var(--space-xl);"><div class="empty-state-icon">🛋️</div><div class="empty-state-title">No hay citas registradas</div></div>';
+    container.innerHTML = '<div class="empty-state" style="padding:var(--space-xl);"><div class="empty-state-icon" style="color:var(--color-teal); opacity:0.6;"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M19 4h-1V3a1 1 0 0 0-2 0v1H8V3a1 1 0 0 0-2 0v1H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 16H5V10h14v10Z"></path></svg></div><div class="empty-state-title">No hay citas registradas</div></div>';
     return;
   }
 

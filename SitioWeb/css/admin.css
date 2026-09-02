@@ -489,3 +489,84 @@
   .admin-topbar { padding: 0 var(--space-md); }
   .page-header { flex-direction: column; align-items: flex-start; }
 }
+
+/* ── Schedule Grid (Calendario) ── */
+.schedule-grid {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  background: rgba(239, 229, 208, 0.4);
+  gap: 1px; /* Borders between cells */
+  border: 1px solid rgba(239, 229, 208, 0.6);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.schedule-header-cell {
+  background: var(--color-bg);
+  padding: var(--space-sm);
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+.schedule-header-cell.text-teal {
+  color: var(--color-teal);
+  background: rgba(13, 148, 136, 0.05);
+}
+.schedule-time-cell {
+  background: var(--color-bg);
+  padding: var(--space-xs) var(--space-sm);
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.schedule-slot {
+  background: var(--color-bg);
+  min-height: 60px;
+  position: relative;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  padding: 4px;
+}
+.schedule-slot:hover {
+  background: rgba(13, 148, 136, 0.04);
+}
+.schedule-event {
+  font-size: 0.75rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: transform 0.2s, box-shadow 0.2s;
+  animation: scaleIn 0.3s ease;
+}
+.schedule-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 10;
+  position: relative;
+}
+.event-confirmed {
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.15), rgba(13, 148, 136, 0.05));
+  color: var(--color-teal-dark);
+  border-left: 3px solid var(--color-teal);
+}
+.event-pending {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+  color: #92400e;
+  border-left: 3px solid #f59e0b;
+}
+.event-cancelled {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.03));
+  color: #991b1b;
+  border-left: 3px solid #ef4444;
+}
