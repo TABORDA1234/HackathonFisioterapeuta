@@ -3,7 +3,7 @@
    Manejo de peticiones HTTP al backend Flask
    =================================================== */
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'https://fisio-backend-s25s.onrender.com/api';
 
 /**
  * Cliente HTTP centralizado con manejo de errores y JWT
