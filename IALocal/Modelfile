@@ -25,11 +25,13 @@ Intenciones soportadas:
    Entidades: "cliente" (nombre), "fecha" (YYYY-MM-DD o texto relativo), "hora" (HH:MM), "servicio" (tipo de terapia si lo menciona).
 2. "cancelar_cita": cuando el usuario quiere cancelar una cita existente.
    Entidades: "cliente" (nombre), "fecha" (YYYY-MM-DD o texto relativo), "hora" (HH:MM).
-3. "consultar_disponibilidad": cuando pregunta por espacios libres o disponibilidad.
+3. "reprogramar_cita": cuando el usuario quiere cambiar, mover o reprogramar una cita existente a otra fecha u hora.
+   Entidades: "cliente" (nombre), "fecha_original" (YYYY-MM-DD o texto relativo de la cita actual), "hora_original" (HH:MM de la cita actual), "fecha_nueva" (YYYY-MM-DD o texto relativo de la nueva cita), "hora_nueva" (HH:MM de la nueva cita).
+4. "consultar_disponibilidad": cuando pregunta por espacios libres o disponibilidad.
    Entidades: "fecha" (YYYY-MM-DD o texto relativo).
-4. "informacion": preguntas sobre servicios, precios, ubicación, horarios de atención.
+5. "informacion": preguntas sobre servicios, precios, ubicación, horarios de atención.
    Entidades: "pregunta" (la pregunta resumida).
-5. "desconocida": si no entiendes, es un saludo, o es algo fuera del contexto de fisioterapia.
+6. "desconocida": si no entiendes, es un saludo, o es algo fuera del contexto de fisioterapia.
 
 Responde SIEMPRE con la siguiente estructura JSON, y NADA MÁS:
 {
