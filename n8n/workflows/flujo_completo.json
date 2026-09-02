@@ -141,7 +141,9 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"cliente_nombre\": \"{{ $json.datos.nombre || 'Sin nombre' }}\",\n  \"fecha\": \"{{ $json.datos.fecha }}\",\n  \"hora\": \"{{ $json.datos.hora }}\",\n  \"servicio\": \"{{ $json.datos.servicio }}\",\n  \"telegram_id\": \"{{ $json.chatId }}\"\n}",
-        "options": {}
+        "options": {
+          "ignoreResponseCode": true
+        }
       },
       "id": "backend-book",
       "name": "Guardar en BD (Backend)",
@@ -167,7 +169,7 @@
       "type": "n8n-nodes-base.googleCalendar",
       "typeVersion": 1,
       "position": [
-        1500,
+        1600,
         150
       ],
       "credentials": {
@@ -188,7 +190,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.1,
       "position": [
-        1750,
+        1800,
         150
       ],
       "credentials": {
@@ -202,8 +204,9 @@
       "parameters": {
         "resource": "message",
         "subject": "=Confirmación de Cita - Fisioterapeuta Li",
-        "message": "=Hola {{ $node['Guardar Respuesta en Memoria'].json.datos.nombre }},\n\nTu cita ha sido confirmada:\n📋 Servicio: {{ $node['Guardar Respuesta en Memoria'].json.datos.servicio }}\n📅 Fecha: {{ $node['Guardar Respuesta en Memoria'].json.datos.fecha }}\n🕐 Hora: {{ $node['Guardar Respuesta en Memoria'].json.datos.hora }}\n\n¡Te esperamos!\nFisioterapeuta Li",
-        "toList": "fisioterapeutali@gmail.com"
+        "message": "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fdfa; border: 1px solid #e2f0e8; border-radius: 10px; overflow: hidden;\">\n    <div style=\"background-color: #2b7a5a; color: white; padding: 20px; text-align: center;\">\n        <h2 style=\"margin: 0; font-size: 24px;\">¡Cita Confirmada! 🌿</h2>\n        <p style=\"margin: 5px 0 0 0; font-size: 16px; opacity: 0.9;\">Fisioterapeuta Li</p>\n    </div>\n    <div style=\"padding: 30px; color: #333;\">\n        <p style=\"font-size: 16px;\">Hola <strong>{{ $node['Guardar Respuesta en Memoria'].json.datos.nombre }}</strong>,</p>\n        <p style=\"font-size: 16px; line-height: 1.5;\">Tu reserva ha sido agendada exitosamente en nuestro sistema. Aquí están los detalles de tu cita:</p>\n        \n        <div style=\"background-color: white; border-left: 4px solid #2b7a5a; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02);\">\n            <p style=\"margin: 5px 0;\"><strong>📋 Servicio:</strong> <span style=\"color: #2b7a5a;\">{{ $node['Guardar Respuesta en Memoria'].json.datos.servicio }}</span></p>\n            <p style=\"margin: 5px 0;\"><strong>📅 Fecha:</strong> {{ $node['Guardar Respuesta en Memoria'].json.datos.fecha }}</p>\n            <p style=\"margin: 5px 0;\"><strong>🕐 Hora:</strong> {{ $node['Guardar Respuesta en Memoria'].json.datos.hora }}</p>\n        </div>\n        \n        <p style=\"font-size: 15px; color: #666; line-height: 1.5;\">Si necesitas cancelar o reprogramar, por favor contáctanos con al menos 24 horas de anticipación a través de nuestro Bot en Telegram.</p>\n        <p style=\"font-size: 16px; margin-top: 30px;\">¡Te esperamos con gusto!</p>\n    </div>\n    <div style=\"background-color: #e2f0e8; padding: 15px; text-align: center; color: #555; font-size: 12px;\">\n        Este es un correo automático, por favor no respondas a este mensaje.\n    </div>\n</div>",
+        "toList": "fisioterapeutali@gmail.com",
+        "appendAttribution": false
       },
       "id": "gmail-send",
       "name": "Gmail (Enviar Correo)",
@@ -217,6 +220,61 @@
         "gmailOAuth2": {
           "id": "",
           "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.error }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "if-error-node",
+      "name": "¿Hubo Error?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const item = $input.all()[0].json;\nconst chatId = $node['Guardar Respuesta en Memoria'].json.chatId;\nconst datos = $node['Guardar Respuesta en Memoria'].json.datos;\n\nlet errorMsg = item.error || 'Error desconocido';\nlet slotsDisponibles = item.slots_disponibles || [];\nlet mensaje = '';\n\nif (errorMsg.includes('no disponible') || errorMsg.includes('Horario no disponible') || item.disponible === false) {\n  mensaje = `😔 Lo siento, el horario de las ${datos.hora} del ${datos.fecha} ya no está disponible.`;\n  if (slotsDisponibles.length > 0) {\n    const primeros = slotsDisponibles.slice(0, 5).map(s => s.substring(11, 16));\n    mensaje += `\\n\\n📋 Horarios libres ese día:\\n${primeros.map(h => '  🕐 ' + h).join('\\n')}`;\n    mensaje += '\\n\\n¿Te gustaría alguno de estos horarios?';\n  } else {\n    mensaje += '\\n\\nNo hay horarios disponibles para ese día. ¿Quieres intentar con otra fecha?';\n  }\n} else if (errorMsg.includes('fecha') && (errorMsg.includes('pasad') || errorMsg.includes('inválid'))) {\n  mensaje = `📅 La fecha ${datos.fecha} no es válida o ya pasó. Por favor, indícame una fecha futura.`;\n} else if (errorMsg.includes('servicio') || errorMsg.includes('no encontrad')) {\n  mensaje = `🔍 No encontré el servicio \"${datos.servicio}\". Nuestros servicios son:\\n  • Terapia Manual\\n  • Rehabilitación Postquirúrgica\\n  • Terapia Deportiva\\n  • Masaje Terapéutico\\n  • Evaluación Inicial\\n  • Electroterapia\\n\\n¿Cuál te interesa?`;\n} else {\n  mensaje = `⚠️ Hubo un problemita al guardar tu cita: ${errorMsg}\\n\\n¿Quieres intentar de nuevo?`;\n}\n\n// Reset the conversation state so user can try again\nconst staticData = $getWorkflowStaticData('global');\nif (staticData.chats && staticData.chats[chatId]) {\n  // Remove the last assistant message that said \"Procesando tu reserva...\"\n  const history = staticData.chats[chatId];\n  if (history.length > 0 && history[history.length - 1].role === 'assistant') {\n    history.pop();\n  }\n}\n\nreturn [{ json: { chatId, mensaje } }];"
+      },
+      "id": "prepare-error-msg",
+      "name": "Preparar Mensaje Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        350
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.mensaje }}",
+        "additionalFields": {}
+      },
+      "id": "telegram-error-reply",
+      "name": "Telegram Responder (Error)",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [
+        1800,
+        350
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account"
         }
       }
     }
@@ -289,7 +347,7 @@
       "main": [
         [
           {
-            "node": "Google Calendar (Crear Evento)",
+            "node": "¿Hubo Error?",
             "type": "main",
             "index": 0
           }
@@ -317,11 +375,40 @@
           }
         ]
       ]
+    },
+    "¿Hubo Error?": {
+      "main": [
+        [
+          {
+            "node": "Preparar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Calendar (Crear Evento)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Mensaje Error": {
+      "main": [
+        [
+          {
+            "node": "Telegram Responder (Error)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "v5-stateful-2026-08-31"
+  "versionId": "v6-error-handling-2026-09-01"
 }

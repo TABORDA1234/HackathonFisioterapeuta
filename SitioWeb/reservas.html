@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reservar Cita — La Fisioterapeuta Li</title>
+  <meta name="description" content="Reserva tu cita de fisioterapia en línea. Elige el servicio, la fecha disponible y confirma tu pago." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/components.css" />
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="site-header scrolled" id="navbar">
+  <div class="container header-inner">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </span>
+      <span class="logo-text">
+        <strong>La Fisioterapeuta</strong> Li
+      </span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="btn-secondary" style="padding: 10px 24px; font-size: 14px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:4px; vertical-align:-3px"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Volver al inicio
+      </a>
+    </nav>
+  </div>
+</header>
+
+<main style="padding-top:100px; min-height:100vh;">
+  <div class="container" style="padding-top:var(--space-2xl); padding-bottom:var(--space-4xl);">
+
+    <!-- Header -->
+    <div class="section-head center" style="margin-bottom:var(--space-2xl);">
+      <span class="section-tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-2px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        Reserva Online
+      </span>
+      <h1 class="section-title">Agenda tu cita</h1>
+      <p class="section-subtitle center-text" style="max-width:540px; margin-top:16px;">
+        Pago anticipado del 100% requerido para confirmar. Cancelaciones con 24–48 h de anticipación.
+      </p>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper" id="stepper" style="max-width:640px; margin:0 auto var(--space-3xl);">
+      <div class="step active" id="step-ind-1">
+        <div class="step-number">1</div>
+        <div class="step-label">Servicio</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-ind-2">
+        <div class="step-number">2</div>
+        <div class="step-label">Fecha & Hora</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-ind-3">
+        <div class="step-number">3</div>
+        <div class="step-label">Tus Datos</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-ind-4">
+        <div class="step-number">4</div>
+        <div class="step-label">Confirmar</div>
+      </div>
+    </div>
+
+    <div style="max-width:720px; margin:0 auto;">
+
+      <!-- PASO 1: Selección de servicio -->
+      <div id="step-1" class="step-panel">
+        <div class="card card-lg">
+          <h2 style="font-size:1.3rem; margin-bottom:var(--space-sm);">¿Qué servicio necesitas?</h2>
+          <p style="margin-bottom:var(--space-xl); color:var(--ink-500);">Selecciona el tipo de atención que buscas.</p>
+          <div id="service-list" style="display:flex; flex-direction:column; gap:var(--space-sm);">
+            <!-- Se llena con JS -->
+          </div>
+          <div style="margin-top:var(--space-xl); text-align:right;">
+            <button class="btn btn-primary" id="btn-step1-next" disabled>Siguiente <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 2: Fecha y hora -->
+      <div id="step-2" class="step-panel hidden">
+        <div class="card card-lg">
+          <h2 style="font-size:1.3rem; margin-bottom:var(--space-sm);">Elige fecha y hora</h2>
+          <p style="margin-bottom:var(--space-xl); color:var(--ink-500);">Solo se muestran los horarios disponibles.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="fecha-cita">Fecha <span class="required">*</span></label>
+              <input type="date" class="form-control" id="fecha-cita" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="sede-cita">Sede <span class="required">*</span></label>
+              <select class="form-control" id="sede-cita">
+                <option value="">— Selecciona sede —</option>
+                <option value="tunja">Tunja (Lunes a Viernes)</option>
+                <option value="turmeque">Turmequé (Sábados y Domingos)</option>
+              </select>
+            </div>
+          </div>
+          <div id="horarios-container" style="margin-top:var(--space-lg);">
+            <p style="color:var(--color-text-muted); font-size:0.9rem;">Selecciona una fecha y sede para ver horarios disponibles.</p>
+          </div>
+          <div style="margin-top:var(--space-xl); display:flex; gap:var(--space-md); justify-content:space-between;">
+            <button class="btn btn-ghost" id="btn-step2-back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Atrás</button>
+            <button class="btn btn-primary" id="btn-step2-next" disabled>Siguiente <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 3: Datos del paciente -->
+      <div id="step-3" class="step-panel hidden">
+        <div class="card card-lg">
+          <h2 style="font-size:1.3rem; margin-bottom:var(--space-sm);">Tus datos de contacto</h2>
+          <p style="margin-bottom:var(--space-xl); color:var(--ink-500);">Para confirmar y enviarte el recibo de pago.</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="nombre-p">Nombre completo <span class="required">*</span></label>
+              <input type="text" class="form-control" id="nombre-p" placeholder="Ej. María García López" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="doc-p">N° de documento <span class="required">*</span></label>
+              <input type="text" class="form-control" id="doc-p" placeholder="Cédula de ciudadanía" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="tel-p">Teléfono / WhatsApp <span class="required">*</span></label>
+              <input type="tel" class="form-control" id="tel-p" placeholder="3XXXXXXXXX" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email-p">Correo electrónico</label>
+              <input type="email" class="form-control" id="email-p" placeholder="correo@ejemplo.com" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="motivo-p">Motivo de consulta / Síntoma principal</label>
+            <textarea class="form-control" id="motivo-p" rows="3" placeholder="Describe brevemente por qué buscas atención..."></textarea>
+          </div>
+          <div class="card" style="background:rgba(245,158,11,0.05); border-color:rgba(245,158,11,0.2); padding:var(--space-md); margin-top:var(--space-sm);">
+            <div style="font-size:0.85rem; color:var(--color-text-muted); display:flex; gap: 8px; align-items:center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--accent)"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              <span>
+                <strong style="color:var(--ink-900);">Pago anticipado requerido.</strong> 
+                Nequi / Llave: <strong style="color:var(--teal-700);">3113981422</strong> · Efectivo
+              </span>
+            </div>
+          </div>
+          <div style="margin-top:var(--space-xl); display:flex; gap:var(--space-md); justify-content:space-between;">
+            <button class="btn btn-ghost" id="btn-step3-back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Atrás</button>
+            <button class="btn btn-primary" id="btn-step3-next">Ver resumen <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 4: Confirmación -->
+      <div id="step-4" class="step-panel hidden">
+        <div class="card card-lg">
+          <h2 style="font-size:1.3rem; margin-bottom:var(--space-xl);">Confirma tu reserva</h2>
+          <div id="resumen-reserva" style="display:flex; flex-direction:column; gap:var(--space-md); margin-bottom:var(--space-xl);">
+            <!-- Generado por JS -->
+          </div>
+          <div class="card" style="background:var(--teal-50); border-color:var(--teal-100); padding:var(--space-lg); margin-bottom:var(--space-xl);">
+            <div style="font-weight:700; color:var(--teal-700); margin-bottom:var(--space-sm); display:flex; align-items:center; gap:8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Política de Cancelación
+            </div>
+            <div style="font-size:0.85rem; color:var(--teal-900);">Si necesitas cancelar o reagendar, hazlo con mínimo 24–48 horas de anticipación por WhatsApp al 3113981422. Fuera de este plazo la sesión se da por realizada y se pierde el valor pagado.</div>
+          </div>
+          <div style="display:flex; gap:var(--space-md); justify-content:space-between; flex-wrap:wrap;">
+            <button class="btn btn-ghost" id="btn-step4-back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Atrás</button>
+            <button class="btn btn-primary btn-lg" id="btn-confirmar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:6px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> Confirmar Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PASO 5: Éxito -->
+      <div id="step-5" class="step-panel hidden">
+        <div class="card card-lg text-center" style="padding:var(--space-4xl);">
+          <div style="display:flex; align-items:center; justify-content:center; width:80px; height:80px; background:var(--success); color:var(--white); border-radius:50%; margin:0 auto var(--space-lg); animation: pulse 1s var(--ease) infinite;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <h2 style="margin-bottom:var(--space-md);">¡Reserva enviada!</h2>
+          <p style="margin-bottom:var(--space-xl); color:var(--ink-500);">Te contactaremos por WhatsApp al número indicado para confirmar el pago y tu cita.</p>
+          <div class="card" style="background:var(--teal-50); border-color:var(--teal-100); display:inline-flex; align-items:center; gap: 16px; padding:var(--space-lg) var(--space-xl); margin-bottom:var(--space-xl);">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--teal-600)"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.3 5.1 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"></path></svg>
+            <div style="text-align:left;">
+              <div style="font-size:1.2rem; font-weight:700; color:var(--teal-700);">311 398 1422</div>
+              <div style="font-size:0.85rem; color:var(--teal-900);">WhatsApp de confirmación</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:var(--space-md); justify-content:center; flex-wrap:wrap;">
+            <a href="https://wa.me/573113981422" target="_blank" class="btn btn-primary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:6px;"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.3 5.1 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"></path></svg> Ir a WhatsApp
+            </a>
+            <a href="index.html" class="btn btn-secondary">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:6px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Volver al inicio
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<a href="https://wa.me/573113981422" target="_blank" class="whatsapp-float">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5 0-.1-.7-1.7-1-2.3-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.3 5.1 4.6.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4z M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"></path></svg>
+</a>
+
+<script src="js/api.js"></script>
+<script src="js/reservas.js"></script>
+</body>
+</html>

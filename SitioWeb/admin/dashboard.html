@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Panel Admin · La Fisioterapeuta Li</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--white)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </div>
+      <div>
+        <div class="sidebar-brand-name">Fisioterapeuta Li</div>
+        <div class="sidebar-brand-sub">Panel de Administración</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Principal</div>
+      <a href="dashboard.html" class="nav-item active">
+        <span class="nav-item-icon">📊</span> Dashboard
+      </a>
+      <a href="citas.html" class="nav-item">
+        <span class="nav-item-icon">📅</span> Agenda & Citas
+      </a>
+      <div class="nav-section-title">Pacientes</div>
+      <a href="pacientes.html" class="nav-item">
+        <span class="nav-item-icon">👥</span> Pacientes
+      </a>
+      <a href="historia-clinica.html" class="nav-item">
+        <span class="nav-item-icon">📋</span> Historia Clínica
+      </a>
+      <div class="nav-section-title">Sistema</div>
+      <a href="../index.html" target="_blank" class="nav-item">
+        <span class="nav-item-icon">🌐</span> Sitio Público
+      </a>
+      <button class="nav-item" id="btn-logout" style="border:none;background:none;width:100%;text-align:left;cursor:pointer;font-family:var(--font-primary);">
+        <span class="nav-item-icon">🚪</span> Cerrar sesión
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebar-avatar">L</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Lina Murillo</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ── Main ── -->
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        <div>
+          <div class="topbar-title">Dashboard</div>
+          <div class="topbar-breadcrumb">Resumen general</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date">📅 —</div>
+        <a href="../reservas.html" target="_blank" class="btn btn-primary btn-sm">+ Nueva Reserva</a>
+      </div>
+    </header>
+
+    <main class="admin-content">
+
+      <!-- KPIs -->
+      <div class="grid grid-4 gap-md" style="margin-bottom:var(--space-xl);" id="kpi-grid">
+        <div class="kpi-card kpi-teal">
+          <div class="kpi-icon">👥</div>
+          <div>
+            <div class="kpi-value" id="kpi-pacientes">—</div>
+            <div class="kpi-label">Total Pacientes</div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-icon">📅</div>
+          <div>
+            <div class="kpi-value" id="kpi-hoy">—</div>
+            <div class="kpi-label">Citas Hoy</div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-warn">
+          <div class="kpi-icon">⏳</div>
+          <div>
+            <div class="kpi-value" id="kpi-pendientes">—</div>
+            <div class="kpi-label">Pendientes de Pago</div>
+          </div>
+        </div>
+        <div class="kpi-card kpi-danger">
+          <div class="kpi-icon">💰</div>
+          <div>
+            <div class="kpi-value" id="kpi-ingresos">—</div>
+            <div class="kpi-label">Ingresos del Mes</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2 gap-xl">
+
+        <!-- Agenda del día -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📅 Agenda de Hoy</span>
+            <a href="citas.html" class="btn btn-ghost btn-sm">Ver todo →</a>
+          </div>
+          <div id="agenda-hoy">
+            <div class="empty-state" style="padding:var(--space-xl);">
+              <div class="empty-state-icon">📋</div>
+              <div class="empty-state-title">Cargando agenda…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráfica de citas por semana -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">📈 Citas — Últimas 7 semanas</span>
+            <span class="badge badge-ok">Por semana</span>
+          </div>
+          <div class="chart-container">
+            <div class="chart-bar-group" id="chart-bars"></div>
+            <div style="display:flex; justify-content:space-between; padding:var(--space-xs) var(--space-sm); margin-top:4px;" id="chart-labels"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Últimos pacientes -->
+      <div class="card" style="margin-top:var(--space-xl);">
+        <div class="card-header">
+          <span class="card-title">👥 Últimos Pacientes Registrados</span>
+          <a href="pacientes.html" class="btn btn-ghost btn-sm">Ver todos →</a>
+        </div>
+        <div class="table-container" id="tabla-pacientes">
+          <div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-title">Cargando…</div></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/dashboard.js"></script>
+</body>
+</html>

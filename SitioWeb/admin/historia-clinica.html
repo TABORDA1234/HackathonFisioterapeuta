@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Historia Clínica — Panel Admin · La Fisioterapeuta Li</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--white)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </div>
+      <div>
+        <div class="sidebar-brand-name">Fisioterapeuta Li</div>
+        <div class="sidebar-brand-sub">Panel de Administración</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Principal</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span> Dashboard</a>
+      <a href="citas.html" class="nav-item"><span class="nav-item-icon">📅</span> Agenda & Citas</a>
+      <div class="nav-section-title">Pacientes</div>
+      <a href="pacientes.html" class="nav-item"><span class="nav-item-icon">👥</span> Pacientes</a>
+      <a href="historia-clinica.html" class="nav-item active"><span class="nav-item-icon">📋</span> Historia Clínica</a>
+      <div class="nav-section-title">Sistema</div>
+      <a href="../index.html" target="_blank" class="nav-item"><span class="nav-item-icon">🌐</span> Sitio Público</a>
+      <button class="nav-item" id="btn-logout" style="border:none;background:none;width:100%;text-align:left;cursor:pointer;font-family:var(--font-primary);"><span class="nav-item-icon">🚪</span> Cerrar sesión</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebar-avatar">L</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Lina Murillo</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        <div>
+          <div class="topbar-title">Historia Clínica</div>
+          <div class="topbar-breadcrumb" id="paciente-breadcrumb">Nuevo paciente</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm" onclick="window.history.back()">← Volver</button>
+        <button class="btn btn-primary btn-sm" id="btn-guardar-hc">💾 Guardar Historia</button>
+      </div>
+    </header>
+
+    <main class="admin-content">
+
+      <div class="hc-layout">
+
+        <!-- Navegación lateral de la HC -->
+        <div class="hc-sidebar">
+          <div class="card card-sm" style="margin-bottom:var(--space-md);">
+            <div class="hc-nav">
+              <a href="#mod-1" class="hc-nav-item active" data-target="mod-1">
+                <span class="hc-nav-num">1</span> Ficha del Paciente
+              </a>
+              <a href="#mod-2" class="hc-nav-item" data-target="mod-2">
+                <span class="hc-nav-num">2</span> Anamnesis
+              </a>
+              <a href="#mod-3" class="hc-nav-item" data-target="mod-3">
+                <span class="hc-nav-num">3</span> Signos Vitales
+              </a>
+              <a href="#mod-4" class="hc-nav-item" data-target="mod-4">
+                <span class="hc-nav-num">4</span> Dolor EVA
+              </a>
+              <a href="#mod-5" class="hc-nav-item" data-target="mod-5">
+                <span class="hc-nav-num">5</span> Diagnóstico
+              </a>
+            </div>
+          </div>
+          <!-- Alertas de semáforo en sidebar -->
+          <div class="card card-sm" id="sidebar-alertas" style="display:flex; flex-direction:column; gap:var(--space-xs);">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:var(--space-xs);">Estado actual</div>
+            <div id="alerta-ta" class="badge badge-neutral" style="justify-content:flex-start;">📊 TA: —</div>
+            <div id="alerta-fc" class="badge badge-neutral" style="justify-content:flex-start;">❤️ FC: —</div>
+            <div id="alerta-spo2" class="badge badge-neutral" style="justify-content:flex-start;">🌡️ SpO2: —</div>
+            <div id="alerta-imc" class="badge badge-neutral" style="justify-content:flex-start;">⚖️ IMC: —</div>
+            <div id="alerta-eva" class="badge badge-neutral" style="justify-content:flex-start;">🔴 EVA: —</div>
+          </div>
+        </div>
+
+        <!-- Contenido de la HC -->
+        <div id="hc-content">
+
+          <!-- ══════════════════════════════════════════════
+               MÓDULO 1 — FICHA DEL PACIENTE
+          ════════════════════════════════════════════════ -->
+          <section class="hc-section" id="mod-1">
+            <div class="hc-section-header">
+              <div class="hc-section-num">1</div>
+              <div>
+                <div class="hc-section-title">Ficha del Paciente</div>
+                <div class="hc-section-desc">Datos de identificación, contacto y seguro médico</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="hc-nombre">Nombre completo <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="hc-nombre" placeholder="Nombre y apellidos" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tipo de Documento</label>
+                  <select class="form-control" id="hc-tipo-doc">
+                    <option value="">— Selecciona —</option>
+                    <option value="CC">C.C. — Cédula de Ciudadanía</option>
+                    <option value="TI">T.I. — Tarjeta de Identidad</option>
+                    <option value="CE">C.E. — Cédula de Extranjería</option>
+                    <option value="PA">Pasaporte</option>
+                    <option value="PPT">PPT — Permiso Protección Temporal</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="hc-num-doc">N° de Documento <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="hc-num-doc" placeholder="Número de documento" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="hc-fec-nac">Fecha de Nacimiento</label>
+                  <input type="date" class="form-control" id="hc-fec-nac" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="hc-edad">Edad</label>
+                  <input type="number" class="form-control" id="hc-edad" placeholder="Calculada automáticamente" readonly style="background:rgba(0,201,167,0.03);" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Género</label>
+                  <select class="form-control" id="hc-genero">
+                    <option value="">— Selecciona —</option>
+                    <option value="F">Femenino</option>
+                    <option value="M">Masculino</option>
+                    <option value="NB">No binario</option>
+                    <option value="ND">Prefiero no decir</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="hc-tel">Teléfono / WhatsApp <span class="required">*</span></label>
+                  <input type="tel" class="form-control" id="hc-tel" placeholder="3XXXXXXXXX" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="hc-email">Correo electrónico</label>
+                  <input type="email" class="form-control" id="hc-email" placeholder="correo@ejemplo.com" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">EPS / Aseguradora</label>
+                  <select class="form-control" id="hc-eps">
+                    <option value="">— Selecciona —</option>
+                    <option value="Sura">Sura</option>
+                    <option value="Sanitas">Sanitas</option>
+                    <option value="Compensar">Compensar</option>
+                    <option value="Nueva EPS">Nueva EPS</option>
+                    <option value="Salud Total">Salud Total</option>
+                    <option value="Capital Salud">Capital Salud</option>
+                    <option value="Famisanar">Famisanar</option>
+                    <option value="Coosalud">Coosalud</option>
+                    <option value="SOS">SOS</option>
+                    <option value="PME">PME (Fuerzas Militares / Policía)</option>
+                    <option value="Particular">Particular / Ninguna</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+                <div class="form-group" id="eps-otro-group" style="display:none;">
+                  <label class="form-label" for="hc-eps-otro">Especifica la EPS</label>
+                  <input type="text" class="form-control" id="hc-eps-otro" placeholder="Nombre de la EPS" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Ciudad de Residencia</label>
+                  <select class="form-control" id="hc-ciudad">
+                    <option value="">— Selecciona —</option>
+                    <option value="Tunja">Tunja</option>
+                    <option value="Turmequé">Turmequé</option>
+                    <option value="Bogotá">Bogotá</option>
+                    <option value="Duitama">Duitama</option>
+                    <option value="Sogamoso">Sogamoso</option>
+                    <option value="Ventaquemada">Ventaquemada</option>
+                    <option value="Samacá">Samacá</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+                <div class="form-group" id="ciudad-otro-group" style="display:none;">
+                  <label class="form-label" for="hc-ciudad-otro">Especifica la ciudad</label>
+                  <input type="text" class="form-control" id="hc-ciudad-otro" placeholder="Ciudad" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Ocupación / Perfil</label>
+                  <select class="form-control" id="hc-ocupacion">
+                    <option value="">— Selecciona —</option>
+                    <option value="Sedentaria/Oficina">Sedentaria / Oficina</option>
+                    <option value="Deportista de Alto Rendimiento">Deportista de Alto Rendimiento</option>
+                    <option value="Amateur/Recreativo">Amateur / Recreativo</option>
+                    <option value="Trabajo Físico Pesado">Trabajo Físico Pesado</option>
+                    <option value="Estudiante">Estudiante</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Contacto de emergencia -->
+              <div style="margin-top:var(--space-lg); padding-top:var(--space-lg); border-top:1px solid var(--color-border);">
+                <div style="font-size:0.85rem; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:var(--space-md);">🆘 Contacto de Emergencia</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label" for="hc-emerg-nombre">Nombre</label>
+                    <input type="text" class="form-control" id="hc-emerg-nombre" placeholder="Nombre del contacto" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="hc-emerg-parentesco">Parentesco</label>
+                    <input type="text" class="form-control" id="hc-emerg-parentesco" placeholder="Ej. Madre, Esposo/a" />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" for="hc-emerg-tel">Teléfono</label>
+                    <input type="tel" class="form-control" id="hc-emerg-tel" placeholder="3XXXXXXXXX" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Módulo de Referidos -->
+              <div style="margin-top:var(--space-lg); padding-top:var(--space-lg); border-top:1px solid var(--color-border);">
+                <div style="font-size:0.85rem; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:var(--space-md);">🤝 Programa de Referidos</div>
+                <div class="form-row" style="align-items:center;">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label" for="hc-referido-por">¿Quién lo refirió?</label>
+                    <input type="text" class="form-control" id="hc-referido-por" placeholder="Nombre del paciente referente" />
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label" for="hc-num-referidos">Referidos efectivos (0–5)</label>
+                    <input type="number" class="form-control" id="hc-num-referidos" min="0" max="5" value="0" placeholder="0" />
+                  </div>
+                </div>
+                <div style="margin-top:var(--space-md);">
+                  <div class="referidos-counter">
+                    <div class="referidos-dots" id="referidos-dots">
+                      <div class="referido-dot"></div>
+                      <div class="referido-dot"></div>
+                      <div class="referido-dot"></div>
+                      <div class="referido-dot"></div>
+                      <div class="referido-dot"></div>
+                    </div>
+                    <span style="font-size:0.85rem; color:var(--color-text-muted);" id="referidos-label">0 de 5 referidos</span>
+                  </div>
+                  <div class="referidos-alert hidden" id="referidos-alert">
+                    🎉 ¡Aplica 10% OFF en el próximo servicio!
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══════════════════════════════════════════════
+               MÓDULO 2 — MOTIVO DE CONSULTA Y ANAMNESIS
+          ════════════════════════════════════════════════ -->
+          <section class="hc-section" id="mod-2">
+            <div class="hc-section-header">
+              <div class="hc-section-num">2</div>
+              <div>
+                <div class="hc-section-title">Motivo de Consulta y Anamnesis</div>
+                <div class="hc-section-desc">Síntomas actuales, antecedentes y evolución de la enfermedad</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="form-row">
+                <div class="form-group" style="grid-column:1/-1;">
+                  <label class="form-label">Motivo Principal de Consulta <span class="required">*</span></label>
+                  <select class="form-control" id="hc-motivo-principal">
+                    <option value="">— Selecciona el motivo —</option>
+                    <option value="Dolor agudo / crónico">Dolor agudo / crónico</option>
+                    <option value="Recuperación postquirúrgica">Recuperación postquirúrgica</option>
+                    <option value="Lesión deportiva / Sobrecarga muscular">Lesión deportiva / Sobrecarga muscular</option>
+                    <option value="Mantenimiento / Descarga postentrenamiento">Mantenimiento / Descarga postentrenamiento</option>
+                    <option value="Problema postural / Ergonomía">Problema postural / Ergonomía</option>
+                    <option value="Disfunción articular">Disfunción articular (ATM, rodilla, hombro, etc.)</option>
+                    <option value="Condición neurológica">Condición neurológica</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="hc-motivo-desc">Descripción detallada por el paciente</label>
+                <textarea class="form-control" id="hc-motivo-desc" rows="4" placeholder="Describe con las palabras del paciente su motivo de consulta…"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="hc-evolucion">Enfermedad Actual / Evolución</label>
+                <textarea class="form-control" id="hc-evolucion" rows="4" placeholder="Inicio de síntomas, causa aparente, tratamientos previos recibidos y respuesta al tratamiento…"></textarea>
+              </div>
+
+              <!-- Antecedentes patológicos -->
+              <div style="margin-top:var(--space-lg); padding-top:var(--space-lg); border-top:1px solid var(--color-border);">
+                <label class="form-label" style="margin-bottom:var(--space-md); display:block;">Antecedentes Patológicos y Clínicos <span class="form-hint">(selección múltiple)</span></label>
+                <div class="checkbox-grid" id="antecedentes-grid">
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="antecedente" value="HTA" />
+                    <div class="checkmark"></div>
+                    <span>Hipertensión arterial (HTA)</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="antecedente" value="Diabetes" />
+                    <div class="checkmark"></div>
+                    <span>Diabetes mellitus</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="antecedente" value="Cirugías previas" />
+                    <div class="checkmark"></div>
+                    <span>Cirugías previas</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="antecedente" value="Fracturas/Traumatismos" />
+                    <div class="checkmark"></div>
+                    <span>Fracturas / Traumatismos previos</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="antecedente" value="Alergias" />
+                    <div class="checkmark"></div>
+                    <span>Alergias (medicamentos, látex…)</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="antecedente" value="Anticoagulantes" />
+                    <div class="checkmark"></div>
+                    <span>Trastornos de coagulación / Anticoagulantes</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="antecedente" value="Implantes/Marcapasos" />
+                    <div class="checkmark"></div>
+                    <span>Implantes / Marcapasos / Placas metálicas</span>
+                  </label>
+                  <label class="checkbox-item">
+                    <input type="checkbox" name="antecedente" value="Embarazo" />
+                    <div class="checkmark"></div>
+                    <span>Embarazo (si aplica)</span>
+                  </label>
+                </div>
+                <div class="form-group" style="margin-top:var(--space-md);">
+                  <label class="form-label" for="hc-otros-antecedentes">Otros antecedentes</label>
+                  <textarea class="form-control" id="hc-otros-antecedentes" rows="2" placeholder="Otros antecedentes relevantes…"></textarea>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══════════════════════════════════════════════
+               MÓDULO 3 — SIGNOS VITALES Y ANTROPOMETRÍA
+          ════════════════════════════════════════════════ -->
+          <section class="hc-section" id="mod-3">
+            <div class="hc-section-header">
+              <div class="hc-section-num">3</div>
+              <div>
+                <div class="hc-section-title">Signos Vitales y Antropometría</div>
+                <div class="hc-section-desc">Semáforos de estado calculados automáticamente</div>
+              </div>
+            </div>
+
+            <div class="card">
+
+              <!-- Tensión Arterial -->
+              <div class="vital-sign-row">
+                <div class="vital-sign-label">
+                  💉 Tensión Arterial
+                  <div class="vital-sign-unit">mmHg</div>
+                </div>
+                <div class="vital-sign-inputs">
+                  <input type="number" id="vs-sistolica" placeholder="Sist." min="60" max="250" />
+                  <span class="vital-sign-sep">/</span>
+                  <input type="number" id="vs-diastolica" placeholder="Diast." min="40" max="150" />
+                </div>
+                <div class="vital-sign-badge">
+                  <span class="badge badge-neutral" id="badge-ta">—</span>
+                </div>
+              </div>
+
+              <!-- Frecuencia Cardíaca -->
+              <div class="vital-sign-row">
+                <div class="vital-sign-label">
+                  ❤️ Frecuencia Cardíaca
+                  <div class="vital-sign-unit">bpm</div>
+                </div>
+                <div class="vital-sign-inputs">
+                  <input type="number" id="vs-fc" placeholder="bpm" min="20" max="300" />
+                </div>
+                <div class="vital-sign-badge">
+                  <span class="badge badge-neutral" id="badge-fc">—</span>
+                </div>
+              </div>
+
+              <!-- Frecuencia Respiratoria -->
+              <div class="vital-sign-row">
+                <div class="vital-sign-label">
+                  🌬️ Frecuencia Respiratoria
+                  <div class="vital-sign-unit">rpm</div>
+                </div>
+                <div class="vital-sign-inputs">
+                  <input type="number" id="vs-fr" placeholder="rpm" min="5" max="60" />
+                </div>
+                <div class="vital-sign-badge">
+                  <span class="badge badge-neutral" id="badge-fr">—</span>
+                </div>
+              </div>
+
+              <!-- SpO2 -->
+              <div class="vital-sign-row">
+                <div class="vital-sign-label">
+                  🌡️ Saturación O₂ (SpO₂)
+                  <div class="vital-sign-unit">%</div>
+                </div>
+                <div class="vital-sign-inputs">
+                  <input type="number" id="vs-spo2" placeholder="%" min="50" max="100" />
+                </div>
+                <div class="vital-sign-badge">
+                  <span class="badge badge-neutral" id="badge-spo2">—</span>
+                </div>
+              </div>
+
+              <!-- IMC -->
+              <div class="vital-sign-row">
+                <div class="vital-sign-label">
+                  ⚖️ IMC
+                  <div class="vital-sign-unit">Calculado</div>
+                </div>
+                <div class="vital-sign-inputs">
+                  <input type="number" id="vs-peso" placeholder="kg" min="1" max="300" step="0.1" style="width:90px;" />
+                  <span style="color:var(--color-text-muted); font-size:0.8rem;">kg</span>
+                  <input type="number" id="vs-talla" placeholder="cm" min="50" max="250" style="width:90px;" />
+                  <span style="color:var(--color-text-muted); font-size:0.8rem;">cm</span>
+                  <span style="font-weight:700; color:var(--color-teal); min-width:40px; text-align:center;" id="imc-valor">—</span>
+                </div>
+                <div class="vital-sign-badge">
+                  <span class="badge badge-neutral" id="badge-imc">—</span>
+                </div>
+              </div>
+
+            </div><!-- /card -->
+          </section>
+
+          <!-- ══════════════════════════════════════════════
+               MÓDULO 4 — EVALUACIÓN DEL DOLOR (EVA)
+          ════════════════════════════════════════════════ -->
+          <section class="hc-section" id="mod-4">
+            <div class="hc-section-header">
+              <div class="hc-section-num">4</div>
+              <div>
+                <div class="hc-section-title">Evaluación del Dolor — Escala EVA</div>
+                <div class="hc-section-desc">Escala Visual Analógica de 0 a 10</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <!-- Slider EVA -->
+              <div class="eva-slider-container" style="margin-bottom:var(--space-xl);">
+                <div class="eva-header">
+                  <div>
+                    <div style="font-weight:700; font-size:0.9rem; margin-bottom:2px;">Intensidad del Dolor</div>
+                    <div style="font-size:0.78rem; color:var(--color-text-muted);">0 = Sin dolor · 10 = Inaguantable</div>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:var(--space-md);">
+                    <div class="eva-score" id="eva-score">0</div>
+                    <div class="eva-label badge badge-ok" id="eva-label">Sin dolor</div>
+                  </div>
+                </div>
+                <div class="eva-slider-track">
+                  <input type="range" class="eva-slider" id="eva-slider" min="0" max="10" value="0" step="1" />
+                </div>
+                <div class="eva-scale-labels">
+                  <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                </div>
+                <div class="eva-faces">
+                  <span class="eva-face" title="Sin dolor">😊</span>
+                  <span class="eva-face" title="Leve">🙂</span>
+                  <span class="eva-face" title="Moderado">😐</span>
+                  <span class="eva-face" title="Severo">😣</span>
+                  <span class="eva-face" title="Inaguantable">😭</span>
+                </div>
+              </div>
+
+              <!-- Tipo de Dolor -->
+              <div style="margin-bottom:var(--space-xl);">
+                <label class="form-label" style="display:block; margin-bottom:var(--space-md);">Tipo de Dolor <span class="form-hint">(selección múltiple)</span></label>
+                <div class="checkbox-grid">
+                  <label class="checkbox-item"><input type="checkbox" name="tipo-dolor" value="Punzante"/><div class="checkmark"></div><span>Punzante</span></label>
+                  <label class="checkbox-item"><input type="checkbox" name="tipo-dolor" value="Opresivo"/><div class="checkmark"></div><span>Opresivo</span></label>
+                  <label class="checkbox-item"><input type="checkbox" name="tipo-dolor" value="Quemante/Ardor"/><div class="checkmark"></div><span>Quemante / Ardor</span></label>
+                  <label class="checkbox-item"><input type="checkbox" name="tipo-dolor" value="Sordo/Profundo"/><div class="checkmark"></div><span>Sordo / Profundo</span></label>
+                  <label class="checkbox-item"><input type="checkbox" name="tipo-dolor" value="Pulsátil"/><div class="checkmark"></div><span>Pulsátil</span></label>
+                  <label class="checkbox-item"><input type="checkbox" name="tipo-dolor" value="Irradiado"/><div class="checkmark"></div><span>Irradiado</span></label>
+                  <label class="checkbox-item"><input type="checkbox" name="tipo-dolor" value="Neuropático"/><div class="checkmark"></div><span>Neuropático</span></label>
+                  <label class="checkbox-item"><input type="checkbox" name="tipo-dolor" value="Localizado"/><div class="checkmark"></div><span>Localizado</span></label>
+                </div>
+              </div>
+
+              <!-- Comportamiento del dolor -->
+              <div class="form-group">
+                <label class="form-label">Comportamiento del Dolor</label>
+                <select class="form-control" id="hc-comportamiento-dolor">
+                  <option value="">— Selecciona —</option>
+                  <option value="Continuo">Continuo</option>
+                  <option value="Intermitente">Intermitente</option>
+                  <option value="Aumenta con movimiento">Aumenta con movimiento</option>
+                  <option value="Aumenta en reposo">Aumenta en reposo</option>
+                  <option value="Nocturno">Nocturno</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══════════════════════════════════════════════
+               MÓDULO 5 — DIAGNÓSTICO Y OBJETIVOS
+          ════════════════════════════════════════════════ -->
+          <section class="hc-section" id="mod-5">
+            <div class="hc-section-header">
+              <div class="hc-section-num">5</div>
+              <div>
+                <div class="hc-section-title">Diagnóstico y Objetivos Terapéuticos</div>
+                <div class="hc-section-desc">Impresión diagnóstica y metas de la intervención</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="form-group">
+                <label class="form-label" for="hc-diagnostico">Diagnóstico / Impresión Diagnóstica <span class="required">*</span></label>
+                <textarea class="form-control" id="hc-diagnostico" rows="5" placeholder="Descripción del diagnóstico fisioterapéutico basado en la evaluación clínica…"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="hc-objetivos">Objetivos al venir a Terapia Física <span class="required">*</span></label>
+                <textarea class="form-control" id="hc-objetivos" rows="5" placeholder="Metas a corto, mediano y largo plazo del proceso de rehabilitación…"></textarea>
+              </div>
+
+              <!-- Botón guardar final -->
+              <div style="margin-top:var(--space-xl); display:flex; justify-content:flex-end; gap:var(--space-md);">
+                <button class="btn btn-outline" onclick="window.history.back()">Cancelar</button>
+                <button class="btn btn-primary btn-lg" id="btn-guardar-hc-2">
+                  💾 Guardar Historia Clínica
+                </button>
+              </div>
+            </div>
+          </section>
+
+        </div><!-- /hc-content -->
+      </div><!-- /hc-layout -->
+    </main>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/historia-clinica.js"></script>
+</body>
+</html>

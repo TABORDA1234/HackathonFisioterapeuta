@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pacientes — Panel Admin · La Fisioterapeuta Li</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+<div class="admin-layout">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--white)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      </div>
+      <div>
+        <div class="sidebar-brand-name">Fisioterapeuta Li</div>
+        <div class="sidebar-brand-sub">Panel de Administración</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">Principal</div>
+      <a href="dashboard.html" class="nav-item"><span class="nav-item-icon">📊</span> Dashboard</a>
+      <a href="citas.html" class="nav-item"><span class="nav-item-icon">📅</span> Agenda & Citas</a>
+      <div class="nav-section-title">Pacientes</div>
+      <a href="pacientes.html" class="nav-item active"><span class="nav-item-icon">👥</span> Pacientes</a>
+      <a href="historia-clinica.html" class="nav-item"><span class="nav-item-icon">📋</span> Historia Clínica</a>
+      <div class="nav-section-title">Sistema</div>
+      <a href="../index.html" target="_blank" class="nav-item"><span class="nav-item-icon">🌐</span> Sitio Público</a>
+      <button class="nav-item" id="btn-logout" style="border:none;background:none;width:100%;text-align:left;cursor:pointer;font-family:var(--font-primary);"><span class="nav-item-icon">🚪</span> Cerrar sesión</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebar-avatar">L</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Lina Murillo</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        <div>
+          <div class="topbar-title">Pacientes</div>
+          <div class="topbar-breadcrumb">Gestión de pacientes</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" id="btn-nuevo-paciente">+ Nuevo Paciente</button>
+      </div>
+    </header>
+
+    <main class="admin-content">
+
+      <!-- Búsqueda y filtros -->
+      <div class="card" style="margin-bottom:var(--space-xl);">
+        <div style="display:flex; gap:var(--space-md); flex-wrap:wrap; align-items:center;">
+          <div class="search-bar" style="flex:1; min-width:240px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Buscar por nombre, teléfono o correo…" />
+          </div>
+          <div style="display:flex; gap:var(--space-sm); align-items:center;">
+            <span class="badge badge-neutral" id="badge-total">— pacientes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de pacientes -->
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div class="table-container" id="tabla-pacientes">
+          <div class="empty-state"><div class="spinner" style="margin:0 auto;"></div><div class="empty-state-title" style="margin-top:var(--space-md);">Cargando pacientes…</div></div>
+        </div>
+        <div id="paginacion" style="padding:var(--space-md);"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── Modal Nuevo Paciente ── -->
+<div class="modal-overlay hidden" id="modal-paciente">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Nuevo Paciente</div>
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <form id="form-paciente" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="p-nombre">Nombre completo <span class="required">*</span></label>
+          <input type="text" class="form-control" id="p-nombre" placeholder="Nombre completo" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="p-telefono">Teléfono / WhatsApp</label>
+          <input type="tel" class="form-control" id="p-telefono" placeholder="3XXXXXXXXX" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="p-email">Correo electrónico</label>
+          <input type="email" class="form-control" id="p-email" placeholder="correo@ejemplo.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="p-telegram">ID de Telegram</label>
+          <input type="text" class="form-control" id="p-telegram" placeholder="Opcional" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="p-notas">Notas médicas iniciales</label>
+        <textarea class="form-control" id="p-notas" rows="3" placeholder="Observaciones iniciales…"></textarea>
+      </div>
+    </form>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="modal-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="modal-save">Guardar Paciente</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/pacientes.js"></script>
+</body>
+</html>

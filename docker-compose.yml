@@ -41,8 +41,9 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - NODE_ENV=production
-      - WEBHOOK_URL=https://ali-administrator-event-architect.trycloudflare.com/
+      - WEBHOOK_URL=https://bird-responding-charging-ooo.trycloudflare.com/
       - GENERIC_TIMEZONE=America/Bogota
+      - N8N_SKIP_AUTH_ON_OAUTH_CALLBACK=true
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:

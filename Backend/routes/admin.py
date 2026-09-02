@@ -157,3 +157,38 @@ def estado_integraciones():
         "operaciones_24h": ops_por_origen,
         "total_operaciones_24h": len(ops_recientes),
     }), 200
+
+
+@admin_bp.route("/resumen", methods=["GET"])
+@jwt_required
+def resumen():
+    """
+    GET /api/admin/resumen
+    Alias del dashboard para compatibilidad con el nuevo SitioWeb.
+    """
+    return dashboard()
+
+
+@admin_bp.route("/citas-hoy", methods=["GET"])
+@jwt_required
+def citas_hoy():
+    """
+    GET /api/admin/citas-hoy
+    Retorna todas las citas de hoy ordenadas por hora.
+    """
+    ahora = datetime.now(timezone.utc).replace(tzinfo=None)
+    hoy = ahora.date()
+
+    inicio_hoy = datetime.combine(hoy, dtime.min)
+    fin_hoy = datetime.combine(hoy, dtime.max)
+
+    citas = Cita.query.filter(
+        Cita.fecha_hora.between(inicio_hoy, fin_hoy),
+    ).order_by(Cita.fecha_hora.asc()).all()
+
+    return jsonify({
+        "fecha": hoy.isoformat(),
+        "citas": [c.to_dict() for c in citas],
+        "total": len(citas),
+    }), 200
+

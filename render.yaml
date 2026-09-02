@@ -38,7 +38,7 @@ services:
   - type: web
     name: fisio-frontend
     env: static
-    buildCommand: "cd SitioWeb && echo \"window.FISIO_API_URL = 'https://fisio-backend-s25s.onrender.com/api';\" > config.js && sed -i '1i<script src=\"config.js\"></script>' index.html"
+    buildCommand: "echo 'Frontend build OK'"
     staticPublishPath: ./SitioWeb
 
 
