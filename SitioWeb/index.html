@@ -757,16 +757,14 @@
       // Connect to backend api.js
       if (window.CitasAPI) {
         const fechaHora = `${formData.date}T${formData.time}:00`;
-        await window.CitasAPI.create({
+        await window.CitasAPI.reservar({
           cliente_nombre: formData.nombre,
           cliente_telefono: formData.telefono,
           cliente_email: formData.email,
           fecha_hora: fechaHora,
           servicio_id: formData.servicioId,
-          servicio_nombre: formData.servicioName,
-          sede: formData.location,
-          notas: formData.notes,
-          estado: 'pendiente',
+          origen: 'web',
+          notas: formData.notes
         });
       }
 
@@ -782,18 +780,12 @@
       document.getElementById('confirm-location').textContent = formData.location;
       document.getElementById('confirm-phone').textContent = formData.telefono;
     } catch (error) {
-      console.warn("API Error (demostración asumiendo envío):", error);
-      // For demo purposes, show success anyway if API is down
-      document.getElementById('booking-form').classList.add('hidden');
-      const confirmPanel = document.getElementById('booking-confirm');
-      confirmPanel.classList.remove('hidden');
-      
-      document.getElementById('confirm-name').textContent = formData.nombre;
-      document.getElementById('confirm-service').textContent = formData.servicioName;
-      document.getElementById('confirm-date').textContent = formData.date;
-      document.getElementById('confirm-time').textContent = formData.time;
-      document.getElementById('confirm-location').textContent = formData.location;
-      document.getElementById('confirm-phone').textContent = formData.telefono;
+      console.error("Error al reservar:", error);
+      if (window.Toast) {
+        window.Toast.error(error.message || 'Error al procesar la reserva. Intenta de nuevo.');
+      } else {
+        alert(error.message || 'Error al procesar la reserva. Intenta de nuevo.');
+      }
     } finally {
       btn.disabled = false;
       btn.innerHTML = originalText;
