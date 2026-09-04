@@ -9,7 +9,7 @@ Auth.fillUserInfo();
 
 // Fecha actual en topbar
 const now = new Date();
-document.getElementById('topbar-date').textContent = '📅 ' + now.toLocaleDateString('es-CO', {
+document.getElementById('topbar-date').innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> ` + now.toLocaleDateString('es-CO', {
   weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
 });
 
@@ -41,7 +41,7 @@ function renderKPIs(data) {
 function renderAgenda(citas) {
   const container = document.getElementById('agenda-hoy');
   if (!citas.length) {
-    container.innerHTML = '<div class="empty-state" style="padding:var(--space-xl);"><div class="empty-state-icon">😴</div><div class="empty-state-title">Sin citas para hoy</div></div>';
+    container.innerHTML = '<div class="empty-state" style="padding:var(--space-xl);"><div class="empty-state-icon" style="color:var(--color-teal);opacity:0.5;"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div><div class="empty-state-title">Sin citas para hoy</div></div>';
     return;
   }
   container.innerHTML = citas.map(c => {
@@ -82,7 +82,7 @@ function renderChart(data) {
 function renderTabla(pacientes) {
   const container = document.getElementById('tabla-pacientes');
   if (!pacientes.length) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-title">Sin pacientes</div></div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon" style="color:var(--color-teal);opacity:0.5;"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="empty-state-title">Sin pacientes</div></div>';
     return;
   }
   container.innerHTML = `

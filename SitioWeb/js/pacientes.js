@@ -32,7 +32,7 @@ function renderTabla(pacientes, total) {
   if (!pacientes.length) {
     container.innerHTML = `
       <div class="empty-state" style="padding:var(--space-3xl);">
-        <div class="empty-state-icon">🔍</div>
+        <div class="empty-state-icon" style="color:var(--color-teal); opacity:0.6;"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></div>
         <div class="empty-state-title">Sin resultados</div>
         <div class="empty-state-desc">No se encontraron pacientes con esa búsqueda.</div>
       </div>`;
@@ -58,22 +58,22 @@ function renderTabla(pacientes, total) {
               <div class="avatar avatar-sm">${Utils.iniciales(p.nombre)}</div>
               <div>
                 <div style="font-weight:600;">${p.nombre}</div>
-                ${p.notas_medicas ? '<div class="tag" style="font-size:0.65rem;margin-top:2px;">📋 HC</div>' : ''}
+                ${p.notas_medicas ? '<div class="tag" style="font-size:0.65rem;margin-top:2px;"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:2px; vertical-align:middle;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> HC</div>' : ''}
               </div>
             </div>
           </td>
           <td>
-            <a href="https://wa.me/57${p.telefono}" target="_blank" style="color:var(--color-teal); font-size:0.88rem;">
-              📱 ${p.telefono || '—'}
+            <a href="https://wa.me/57${p.telefono}" target="_blank" style="color:var(--color-teal); font-size:0.88rem; display:flex; align-items:center; gap:4px;">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--color-text-muted)"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> ${p.telefono || '—'}
             </a>
           </td>
           <td class="td-muted">${p.email || '—'}</td>
           <td class="td-muted">${Utils.formatDate(p.created_at)}</td>
           <td>
             <div style="display:flex; gap:var(--space-xs);">
-              <a href="historia-clinica.html?id=${p.id}" class="btn btn-ghost btn-sm" title="Ver Historia Clínica">📋 HC</a>
-              <button class="btn btn-ghost btn-sm" onclick="editarPaciente(${p.id})" title="Editar">✏️</button>
-              <button class="btn btn-danger btn-sm" onclick="eliminarPaciente(${p.id}, '${p.nombre}')" title="Eliminar">🗑️</button>
+              <a href="historia-clinica.html?id=${p.id}" class="btn btn-ghost btn-sm" title="Ver Historia Clínica"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:4px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> HC</a>
+              <button class="btn btn-ghost btn-sm" onclick="editarPaciente(${p.id})" title="Editar"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn btn-danger btn-sm" onclick="eliminarPaciente(${p.id}, '${p.nombre}')" title="Eliminar"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
             </div>
           </td>
         </tr>`).join('')}
