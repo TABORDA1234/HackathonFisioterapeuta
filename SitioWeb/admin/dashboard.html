@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,163 +10,358 @@
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/components.css" />
   <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="stylesheet" href="../css/dashboard-extra.css" />
 </head>
+
 <body>
-<div class="admin-layout">
+  <div class="admin-layout">
 
-  <!-- ── Sidebar ── -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-brand-icon">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--white)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-      </div>
-      <div>
-        <div class="sidebar-brand-name">Fisioterapeuta Li</div>
-        <div class="sidebar-brand-sub">Panel de Administración</div>
-      </div>
-    </div>
-        <nav class="sidebar-nav">
-      <div class="nav-section-title">Principal</div>
-      <a href="dashboard.html" class="nav-item active">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 17v-4"/><path d="M12 17V9"/><path d="M17 17V5"/></svg></span> Dashboard
-      </a>
-      <a href="citas.html" class="nav-item">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> Agenda & Citas
-      </a>
-      <div class="nav-section-title">Pacientes</div>
-      <a href="pacientes.html" class="nav-item">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> Pacientes
-      </a>
-      <a href="historia-clinica.html" class="nav-item">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> Historia Clínica
-      </a>
-      <div class="nav-section-title">Administración</div>
-      <a href="servicios.html" class="nav-item">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span> Servicios
-      </a>
-      <a href="usuarios.html" class="nav-item">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> Usuarios (Admins)
-      </a>
-      <a href="auditorias.html" class="nav-item">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span> Auditorías
-      </a>
-      <div class="nav-section-title">Sistema</div>
-      <a href="../index.html" target="_blank" class="nav-item">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> Sitio Público
-      </a>
-      <button class="nav-item" id="btn-logout" style="border:none;background:none;width:100%;text-align:left;cursor:pointer;font-family:var(--font-primary);">
-        <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> Cerrar sesión
-      </button>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="sidebar-user">
-        <div class="avatar" id="sidebar-avatar">L</div>
-        <div class="sidebar-user-info">
-          <div class="sidebar-user-name" id="sidebar-user-name">Lina Murillo</div>
-          <div class="sidebar-user-role" id="sidebar-user-role">Administrador</div>
+    <!-- ── Sidebar (sin cambios) ── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color:var(--white)">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+            </path>
+          </svg>
         </div>
-      </div>
-    </div>
-  </aside>
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-  <!-- ── Main ── -->
-  <div class="admin-main">
-    <header class="admin-topbar">
-      <div class="topbar-left">
-        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
         <div>
-          <div class="topbar-title">Dashboard</div>
-          <div class="topbar-breadcrumb">Resumen general</div>
+          <div class="sidebar-brand-name">Fisioterapeuta Li</div>
+          <div class="sidebar-brand-sub">Panel de Administración</div>
         </div>
       </div>
-      <div class="topbar-right">
-        <div class="topbar-date" id="topbar-date"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> —</div>
-        <a href="../reservas.html" target="_blank" class="btn btn-primary btn-sm">+ Nueva Reserva</a>
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Principal</div>
+        <a href="dashboard.html" class="nav-item active">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M7 17v-4" />
+              <path d="M12 17V9" />
+              <path d="M17 17V5" />
+            </svg></span> Dashboard
+        </a>
+        <a href="citas.html" class="nav-item">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg></span> Agenda & Citas
+        </a>
+        <div class="nav-section-title">Pacientes</div>
+        <a href="pacientes.html" class="nav-item">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span> Pacientes
+        </a>
+        <a href="historia-clinica.html" class="nav-item">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+            </svg></span> Historia Clínica
+        </a>
+        <div class="nav-section-title">Administración</div>
+        <a href="servicios.html" class="nav-item">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+              <line x1="7" y1="7" x2="7.01" y2="7" />
+            </svg></span> Servicios
+        </a>
+        <a href="usuarios.html" class="nav-item">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg></span> Usuarios (Admins)
+        </a>
+        <a href="auditorias.html" class="nav-item">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg></span> Auditorías
+        </a>
+        <div class="nav-section-title">Sistema</div>
+        <a href="../index.html" target="_blank" class="nav-item">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="2" y1="12" x2="22" y2="12" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg></span> Sitio Público
+        </a>
+        <button class="nav-item" id="btn-logout"
+          style="border:none;background:none;width:100%;text-align:left;cursor:pointer;font-family:var(--font-primary);">
+          <span class="nav-item-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg></span> Cerrar sesión
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="sidebar-user">
+          <div class="avatar" id="sidebar-avatar">L</div>
+          <div class="sidebar-user-info">
+            <div class="sidebar-user-name" id="sidebar-user-name">Lina Murillo</div>
+            <div class="sidebar-user-role" id="sidebar-user-role">Administrador</div>
+          </div>
+        </div>
       </div>
-    </header>
+    </aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <main class="admin-content">
-
-      <!-- KPIs -->
-      <div class="grid grid-4 gap-md" style="margin-bottom:var(--space-xl);" id="kpi-grid">
-        <div class="kpi-card kpi-teal">
-          <div class="kpi-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <!-- ── Main ── -->
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
           <div>
-            <div class="kpi-value" id="kpi-pacientes">—</div>
-            <div class="kpi-label">Total Pacientes</div>
+            <div class="topbar-title">Dashboard</div>
+            <div class="topbar-breadcrumb">Resumen general</div>
           </div>
         </div>
-        <div class="kpi-card kpi-blue">
-          <div class="kpi-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-          <div>
-            <div class="kpi-value" id="kpi-hoy">—</div>
-            <div class="kpi-label">Citas Hoy</div>
-          </div>
+        <div class="topbar-right">
+          <div class="topbar-date" id="topbar-date"><svg width="14" height="14" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg> —</div>
+          <a href="../reservas.html" target="_blank" class="btn btn-primary btn-sm">+ Nueva Reserva</a>
         </div>
-        <div class="kpi-card kpi-warn">
-          <div class="kpi-icon">⏳</div>
-          <div>
-            <div class="kpi-value" id="kpi-pendientes">—</div>
-            <div class="kpi-label">Pendientes de Pago</div>
-          </div>
-        </div>
-        <div class="kpi-card kpi-danger">
-          <div class="kpi-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-          <div>
-            <div class="kpi-value" id="kpi-ingresos">—</div>
-            <div class="kpi-label">Ingresos del Mes</div>
-          </div>
-        </div>
-      </div>
+      </header>
 
-      <div class="grid grid-2 gap-xl">
+      <main class="admin-content">
 
-        <!-- Agenda del día -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Agenda de Hoy</span>
-            <a href="citas.html" class="btn btn-ghost btn-sm">Ver todo →</a>
+        <!-- Fila de bienvenida + refrescar -->
+        <div class="welcome-row">
+          <div>
+            <span class="eyebrow">RESUMEN DE ACTIVIDAD</span>
+            <h2>Todo bajo control.</h2>
           </div>
-          <div id="agenda-hoy">
-            <div class="empty-state" style="padding:var(--space-xl);">
-              <div class="empty-state-icon" style="color:var(--color-teal);opacity:0.6;"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
-              <div class="empty-state-title">Cargando agenda…</div>
+          <button class="refresh-button" id="btn-refresh">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            <span id="last-updated">Actualizar</span>
+          </button>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-4 gap-md" style="margin-bottom:var(--space-xl);" id="kpi-grid">
+          <div class="kpi-card kpi-teal">
+            <div class="kpi-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg></div>
+            <div>
+              <div class="kpi-value" id="kpi-pacientes">—</div>
+              <div class="kpi-label">Total Pacientes</div>
+            </div>
+          </div>
+          <div class="kpi-card kpi-blue">
+            <div class="kpi-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg></div>
+            <div>
+              <div class="kpi-value" id="kpi-hoy">—</div>
+              <div class="kpi-label">Citas Hoy</div>
+            </div>
+          </div>
+          <div class="kpi-card kpi-warn">
+            <div class="kpi-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M15 6H9M20 21H19M19 21H5M19 21C19 18.4898 17.7877 16.1341 15.7451 14.675L12 12M5 21H4M5 21C5 18.4898 6.21228 16.1341 8.25493 14.675L12 12M20 3H19M19 3H5M19 3C19 5.51022 17.7877 7.86592 15.7451 9.32495L12 12M5 3H4M5 3C5 5.51022 6.21228 7.86592 8.25493 9.32495L12 12"
+                  stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div class="kpi-value" id="kpi-pendientes">—</div>
+              <div class="kpi-label">Pendientes de Pago</div>
+            </div>
+          </div>
+          <div class="kpi-card kpi-danger">
+            <div class="kpi-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg></div>
+            <div>
+              <div class="kpi-value" id="kpi-ingresos">—</div>
+              <div class="kpi-label">Ingresos del Mes</div>
             </div>
           </div>
         </div>
 
-        <!-- Gráfica de citas por semana -->
-        <div class="card">
+        <div class="grid grid-2 gap-xl">
+
+          <!-- Agenda del día -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg> Agenda de Hoy</span>
+              <a href="citas.html" class="btn btn-ghost btn-sm">Ver todo →</a>
+            </div>
+            <div id="agenda-hoy">
+              <div class="empty-state" style="padding:var(--space-xl);">
+                <div class="empty-state-icon" style="color:var(--color-teal);opacity:0.6;"><svg width="32" height="32"
+                    fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                    </path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                  </svg></div>
+                <div class="empty-state-title">Cargando agenda…</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfica de citas por semana -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg> Citas — Últimas 7 semanas</span>
+              <span class="badge badge-ok">Por semana</span>
+            </div>
+            <div class="chart-container">
+              <div class="chart-bar-group" id="chart-bars"></div>
+              <div
+                style="display:flex; justify-content:space-between; padding:var(--space-xs) var(--space-sm); margin-top:4px;"
+                id="chart-labels"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Evolución de registros + Participación en programas -->
+        <div class="grid grid-2 gap-xl" style="margin-top:var(--space-xl);">
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg> Evolución de registros</span>
+              <span class="badge badge-info">Usuarios</span>
+            </div>
+            <div id="registration-chart"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <path d="M7 17v-4" />
+                  <path d="M12 17V9" />
+                  <path d="M17 17V5" />
+                </svg> Participación en programas</span>
+            </div>
+            <div id="program-chart"></div>
+          </div>
+
+        </div>
+
+        <!-- Distribución de usuarios + Estado de solicitudes + Salud del sistema -->
+        <div class="grid grid-3 gap-xl" style="margin-top:var(--space-xl);">
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg> Distribución de usuarios</span>
+            </div>
+            <div id="role-donut"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+                  <path d="M9 11l3 3L22 4" />
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                </svg> Estado de solicitudes</span>
+            </div>
+            <div id="status-donut"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="16 12 12 8 8 12" />
+                  <line x1="12" y1="16" x2="12" y2="8" />
+                </svg> Salud del sistema</span>
+            </div>
+            <div class="health-list" id="health-list"></div>
+          </div>
+
+        </div>
+
+        <!-- Últimos pacientes -->
+        <div class="card" style="margin-top:var(--space-xl);">
           <div class="card-header">
-            <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Citas — Últimas 7 semanas</span>
-            <span class="badge badge-ok">Por semana</span>
+            <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg> Últimos Pacientes Registrados</span>
+            <a href="pacientes.html" class="btn btn-ghost btn-sm">Ver todos →</a>
           </div>
-          <div class="chart-container">
-            <div class="chart-bar-group" id="chart-bars"></div>
-            <div style="display:flex; justify-content:space-between; padding:var(--space-xs) var(--space-sm); margin-top:4px;" id="chart-labels"></div>
+          <div class="table-container" id="tabla-pacientes">
+            <div class="empty-state">
+              <div class="empty-state-icon">⏳</div>
+              <div class="empty-state-title">Cargando…</div>
+            </div>
           </div>
         </div>
 
-      </div>
+        <footer class="dashboard-footer">Los datos se actualizan automáticamente cada 30 segundos · Sistema conectado
+        </footer>
 
-      <!-- Últimos pacientes -->
-      <div class="card" style="margin-top:var(--space-xl);">
-        <div class="card-header">
-          <span class="card-title"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:text-bottom;margin-right:4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Últimos Pacientes Registrados</span>
-          <a href="pacientes.html" class="btn btn-ghost btn-sm">Ver todos →</a>
-        </div>
-        <div class="table-container" id="tabla-pacientes">
-          <div class="empty-state"><div class="empty-state-icon">⏳</div><div class="empty-state-title">Cargando…</div></div>
-        </div>
-      </div>
-
-    </main>
+      </main>
+    </div>
   </div>
-</div>
 
-<script src="../js/api.js"></script>
-<script src="../js/auth.js"></script>
-<script src="../js/dashboard.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/dashboard.js"></script>
 </body>
+
 </html>
