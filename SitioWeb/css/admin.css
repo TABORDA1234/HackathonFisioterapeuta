@@ -570,3 +570,100 @@
   color: #991b1b;
   border-left: 3px solid #ef4444;
 }
+
+/* ── Checkboxes ── */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-md);
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  padding: var(--space-xs) 0;
+  user-select: none;
+}
+
+.checkbox-item input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: relative;
+  height: 18px;
+  width: 18px;
+  background-color: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: 4px;
+  margin-right: 10px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-item:hover input ~ .checkmark {
+  border-color: var(--color-teal);
+}
+
+.checkbox-item input:checked ~ .checkmark {
+  background-color: var(--color-teal);
+  border-color: var(--color-teal);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-item input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* ── Tables ── */
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+table th {
+  background-color: rgba(239, 229, 208, 0.4);
+  padding: var(--space-md);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid var(--color-border);
+}
+table td {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  vertical-align: middle;
+}
+table tbody tr:hover {
+  background-color: rgba(13, 148, 136, 0.03);
+}
+.actions-cell {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+}

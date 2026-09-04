@@ -163,7 +163,7 @@ window.seleccionarDia = function(isoStr) {
       </div>
       <div style="font-weight:600; font-size:0.95rem;">${c.cliente_nombre}</div>
       <div style="font-size:0.8rem; color:var(--color-text-muted);">${c.servicio_nombre}</div>
-      ${c.sede ? `<div style="font-size:0.75rem; color:var(--color-text-subtle); margin-top:4px;">📍 Sede ${c.sede === 'tunja' ? 'Tunja' : 'Turmequé'}</div>` : ''}
+      ${c.sede ? `<div style="font-size:0.75rem; color:var(--color-text-subtle); margin-top:4px; display:flex; align-items:center; gap:4px;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> Sede ${c.sede === 'tunja' ? 'Tunja' : 'Turmequé'}</div>` : ''}
     </div>`;
   }).join('');
 };
@@ -289,21 +289,18 @@ window.abrirDetalleCita = function(id) {
     <div style="display:flex; justify-content:space-between; margin-bottom:var(--space-md);">
       <div>
         <div style="font-weight:700; font-size:1.2rem;">${cita.cliente_nombre}</div>
-        <div style="color:var(--color-text-muted); font-size:0.9rem;">📱 ${cita.cliente_telefono || '—'}</div>
+        <div style="color:var(--color-text-muted); font-size:0.9rem;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:text-bottom; margin-right:4px;"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> ${cita.cliente_telefono || '—'}</div>
       </div>
       <div>${badge}</div>
     </div>
     <div class="card" style="background:rgba(255,255,255,0.02); padding:var(--space-md); margin-bottom:var(--space-md);">
       <div style="margin-bottom:8px;"><span style="color:var(--color-text-muted);font-size:0.85rem;width:80px;display:inline-block;">Servicio</span> <strong>${cita.servicio_nombre}</strong></div>
-      <div style="margin-bottom:8px;"><span style="color:var(--color-text-muted);font-size:0.85rem;width:80px;display:inline-block;">Sede</span> <strong>${cita.sede === 'tunja' ? 'Tunja' : 'Turmequé'}</strong></div>
+      <div style="margin-bottom:8px;"><span style="color:var(--color-text-muted);font-size:0.85rem;width:80px;display:inline-block;">Sede</span> <strong>${cita.sede === 'tunja' ? 'Tunja' : cita.sede === 'turmeque' ? 'Turmequé' : 'Por definir'}</strong></div>
       <div style="margin-bottom:8px;"><span style="color:var(--color-text-muted);font-size:0.85rem;width:80px;display:inline-block;">Fecha</span> <strong>${d.toLocaleDateString('es-CO')}</strong></div>
-      <div><span style="color:var(--color-text-muted);font-size:0.85rem;width:80px;display:inline-block;">Hora</span> <strong style="color:var(--color-teal);">${d.toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'})}</strong></div>
+      <div style="margin-bottom:8px;"><span style="color:var(--color-text-muted);font-size:0.85rem;width:80px;display:inline-block;">Hora</span> <strong style="color:var(--color-teal);">${d.toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'})}</strong></div>
+      <div style="margin-bottom:8px;"><span style="color:var(--color-text-muted);font-size:0.85rem;width:80px;display:inline-block;">Origen</span> <strong>${cita.origen === 'web' ? 'Página Web' : 'Interno'}</strong></div>
+      ${cita.notas ? `<div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--color-border);"><span style="color:var(--color-text-muted);font-size:0.85rem;display:block;margin-bottom:4px;">Notas / Observaciones</span> <div style="font-size:0.9rem; line-height:1.4;">${cita.notas}</div></div>` : ''}
     </div>
-    ${cita.notas ? `
-      <div style="font-size:0.85rem; color:var(--color-text-muted); margin-bottom:var(--space-md);">
-        <strong>Notas:</strong><br/>${cita.notas}
-      </div>
-    ` : ''}
   `;
 
   // Botones de acción según estado
