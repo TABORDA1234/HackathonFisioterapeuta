@@ -1,0 +1,243 @@
+/* ===================================================
+   DASHBOARD-EXTRA.CSS
+   Estilos adicionales para las secciones nuevas del dashboard:
+   fila de bienvenida, gráficas (línea / barras horizontales / donut),
+   salud del sistema y grid de 3 columnas.
+   No modifica ni reemplaza admin.css — solo lo complementa.
+   =================================================== */
+
+/* --- Grid de 3 columnas (reutiliza tus variables de espaciado) --- */
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 900px) {
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Fila de bienvenida --- */
+.welcome-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.welcome-row .eyebrow {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-teal);
+    margin-bottom: 4px;
+}
+
+.welcome-row h2 {
+    margin: 0;
+    font-size: 1.35rem;
+    color: var(--color-text);
+}
+
+.refresh-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 8px);
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.refresh-button:hover {
+    background: var(--color-bg-soft, #f4f4f2);
+    color: var(--color-teal);
+}
+
+/* --- Badge extra usado en "Evolución de registros" --- */
+.badge-info {
+    background: rgba(47, 111, 143, 0.12);
+    color: #2f6f8f;
+}
+
+/* --- Línea de tiempo (SVG generado por JS) --- */
+.line-chart-wrap {
+    width: 100%;
+}
+
+.line-chart-wrap .chart-axis-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding: 0 4px;
+}
+
+.line-chart-wrap .chart-axis-labels span {
+    font-size: 10px;
+    color: var(--color-text-muted);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- Barras horizontales (participación en programas) --- */
+.hbar-list {
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.hbar-row {
+    margin-bottom: 12px;
+}
+
+.hbar-row:last-child {
+    margin-bottom: 0;
+}
+
+.hbar-row-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+}
+
+.hbar-row-label {
+    color: var(--color-text-muted);
+    flex: 1;
+    padding-right: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hbar-row-value {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.hbar-row-value .hbar-secondary {
+    color: var(--color-text-muted);
+    font-weight: 400;
+    margin-left: 8px;
+}
+
+.hbar-track {
+    display: flex;
+    gap: 4px;
+    height: 10px;
+    border-radius: 9999px;
+    background: var(--color-bg-soft, #f3f4f6);
+    overflow: hidden;
+}
+
+.hbar-fill {
+    height: 100%;
+    border-radius: 9999px;
+}
+
+/* --- Donut chart --- */
+.donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 140px;
+}
+
+.donut-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+}
+
+.donut-legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.donut-legend-label {
+    color: var(--color-text-muted);
+    flex: 1;
+    text-transform: capitalize;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.donut-legend-value {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.donut-legend-pct {
+    color: var(--color-text-light, #9ca3af);
+    font-size: 0.75rem;
+    width: 38px;
+    text-align: right;
+}
+
+/* --- Salud del sistema --- */
+.health-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.health-list>div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.85rem;
+}
+
+.health-list>div:last-child {
+    border-bottom: none;
+}
+
+.health-list>div>span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-muted);
+}
+
+.health-list>div>span svg {
+    color: var(--color-teal);
+    flex-shrink: 0;
+}
+
+.health-list>div>strong {
+    color: var(--color-text);
+    font-size: 0.95rem;
+}
+
+/* --- Footer del dashboard --- */
+.dashboard-footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    padding: var(--space-lg) 0 var(--space-sm);
+}
