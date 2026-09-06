@@ -85,10 +85,10 @@ function colocarCitasEnGrid() {
 
   citasCache.forEach(c => {
     if (!c.fecha_hora) return;
-    // Extraer YYYY-MM-DD y HH:MM
-    const dateObj = new Date(c.fecha_hora);
-    const fecha = dateObj.toISOString().split('T')[0];
-    const hora = dateObj.toTimeString().substring(0, 5); // "07:00"
+    // Extraer YYYY-MM-DD y HH:MM sin que el navegador cambie la zona horaria
+    const partes = c.fecha_hora.split(/[T ]/);
+    const fecha = partes[0];
+    const hora = partes[1] ? partes[1].substring(0, 5) : '';
     
     // Buscar el slot
     const slotEl = document.querySelector(`.schedule-slot[data-slot="${fecha}T${hora}"]`);

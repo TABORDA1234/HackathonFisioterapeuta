@@ -141,3 +141,15 @@ docker-compose up -d --build
    - `JWT_SECRET_KEY`: *Tu clave secreta JWT*
    - `N8N_API_KEY`: *Tu clave secreta para n8n*
    - `SECRET_KEY`: *Tu clave secreta de Flask*
+   
+
+## Comandos Útiles
+**Levantar todos los servicios (incluyendo túnel de Cloudflare y n8n):**
+```bash
+docker compose up -d
+```
+
+**Ver la URL generada por el túnel:**
+```bash
+docker logs fisio_cloudflared
+```

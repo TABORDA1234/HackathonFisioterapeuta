@@ -41,13 +41,25 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       - NODE_ENV=production
-      - WEBHOOK_URL=https://allocated-walt-heights-european.trycloudflare.com/
+      - WEBHOOK_URL=https://laboratory-pit-toddler-actions.trycloudflare.com/
       - GENERIC_TIMEZONE=America/Bogota
       - N8N_SKIP_AUTH_ON_OAUTH_CALLBACK=true
     volumes:
       - n8n_data:/home/node/.n8n
     depends_on:
       - backend
+
+  # ── TUNEL CLOUDFLARE (Temporal) ──
+  cloudflared:
+    image: cloudflare/cloudflared
+    container_name: fisio_cloudflared
+    command: tunnel --url http://fisio_n8n:5678
+    restart: unless-stopped
+    depends_on:
+      - n8n
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
 
 volumes:
   n8n_data:

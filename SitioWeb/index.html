@@ -726,8 +726,56 @@
 
   // Init min date
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('bk-date').min = today;
-  renderTimeSlots();
+  const dateInput = document.getElementById('bk-date');
+  const serviceInput = document.getElementById('bk-service');
+  dateInput.min = today;
+  
+  // Render loading initially
+  timeSlotsContainer.innerHTML = '<p style="color:var(--color-text-muted); font-size: 0.9rem;">Selecciona una fecha y servicio para ver disponibilidad</p>';
+
+  async function fetchAndRenderSlots() {
+    const fecha = dateInput.value;
+    const servicioId = serviceInput.value;
+    
+    if (!fecha || !servicioId) return;
+
+    timeSlotsContainer.innerHTML = '<p style="color:var(--color-text-muted); font-size: 0.9rem;">Cargando horarios...</p>';
+    selectedTime = null;
+
+    try {
+      if (window.CitasAPI) {
+        const data = await window.CitasAPI.disponibilidad(fecha, servicioId);
+        // data.slots_disponibles is an array of ISO strings e.g. "2026-09-08T14:00:00"
+        if (!data.slots_disponibles || data.slots_disponibles.length === 0) {
+           timeSlotsContainer.innerHTML = '<p style="color:var(--color-text-muted); font-size: 0.9rem;">No hay horarios disponibles para esta fecha.</p>';
+           return;
+        }
+        
+        // Extract HH:MM from ISO strings
+        const availableTimes = data.slots_disponibles.map(iso => iso.split('T')[1].substring(0, 5));
+        
+        timeSlotsContainer.innerHTML = availableTimes.map(t => `
+          <button type="button" class="time-slot ${selectedTime === t ? 'selected' : ''}" data-time="${t}">
+            ${t}
+          </button>
+        `).join('');
+
+        timeSlotsContainer.querySelectorAll('.time-slot').forEach(btn => {
+          btn.addEventListener('click', () => {
+            selectedTime = btn.getAttribute('data-time');
+            // Re-render UI to update selected class
+            timeSlotsContainer.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+          });
+        });
+      }
+    } catch (e) {
+      timeSlotsContainer.innerHTML = '<p style="color:red; font-size: 0.9rem;">Error al cargar horarios.</p>';
+    }
+  }
+
+  dateInput.addEventListener('change', fetchAndRenderSlots);
+  serviceInput.addEventListener('change', fetchAndRenderSlots);
 
   document.getElementById('booking-form').addEventListener('submit', async (e) => {
     e.preventDefault();

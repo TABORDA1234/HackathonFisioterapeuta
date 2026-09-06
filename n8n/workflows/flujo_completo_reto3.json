@@ -25,7 +25,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.chats = staticData.chats || {};\n\nconst item = $input.all()[0].json;\nconst chatId = item.message.chat.id;\nconst text = item.message.text || '';\n\nif (text.toLowerCase() === '/start' || text.toLowerCase() === 'reiniciar') {\n  staticData.chats[chatId] = [];\n}\n\nif (!staticData.chats[chatId] || staticData.chats[chatId].length === 0) {\n  const systemPrompt = `Eres Fisioterapeuta Li, un asistente inteligente corporativo por Telegram.\nTu objetivo es ayudar a gestionar el negocio. Eres capaz de:\n1. Agendar citas (agendar_cita). Pide nombre, fecha (YYYY-MM-DD), hora (HH:MM) y servicio.\n2. Consultar la agenda del día (consultar_agenda).\n3. Crear carpetas en Google Drive (crear_carpeta). Pide el nombre de la carpeta.\n4. Buscar archivos en Google Drive (buscar_archivo). Pide el nombre del archivo.\n5. Guardar reportes o notas en Google Sheets (guardar_reporte). Pide el texto de la nota.\n\nRESPONDE ÚNICAMENTE CON UN JSON VÁLIDO en este formato:\n{\n  \"estado\": \"conversar\" | \"agendar_cita\" | \"consultar_agenda\" | \"crear_carpeta\" | \"buscar_archivo\" | \"guardar_reporte\",\n  \"mensaje_usuario\": \"Lo que le dices al usuario en Telegram. Por ejemplo, confirmaciones o pedir datos faltantes.\",\n  \"datos\": {\n    \"nombre\": \"\",\n    \"fecha\": \"\",\n    \"hora\": \"\",\n    \"servicio\": \"\",\n    \"nombre_carpeta\": \"\",\n    \"nombre_archivo\": \"\",\n    \"texto_reporte\": \"\"\n  }\n}\n\nREGLAS DE ESTADO:\n- 'conversar': Usa esto si el usuario te saluda, te hace una pregunta general, o si te faltan datos para ejecutar una de las otras acciones. Pide amablemente los datos faltantes.\n- 'agendar_cita': USA ESTO SOLO SI el usuario explícitamente confirmó que quiere reservar Y ya tienes nombre, fecha, hora y servicio.\n- 'consultar_agenda': Usa esto si el usuario quiere saber las citas o la agenda de hoy.\n- 'crear_carpeta': Usa esto si el usuario te pidió crear una carpeta Y ya tienes el nombre de la carpeta.\n- 'buscar_archivo': Usa esto si el usuario quiere buscar un documento Y ya te dijo el nombre.\n- 'guardar_reporte': Usa esto si el usuario te pide registrar algo en el sistema/sábana Y ya tienes el texto.\n\nREGLAS DE DATOS:\n- Mantén siempre en el JSON los datos que ya hayas recolectado en el historial.`;\n\n  staticData.chats[chatId] = [{ role: 'system', content: systemPrompt }];\n}\n\nif (staticData.chats[chatId].length > 15) {\n  staticData.chats[chatId] = [staticData.chats[chatId][0], ...staticData.chats[chatId].slice(-14)];\n}\n\nstaticData.chats[chatId].push({ role: 'user', content: text });\n\nreturn [{ json: { chatId: chatId, messages: staticData.chats[chatId] } }];"
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.chats = staticData.chats || {};\n\nconst item = $input.all()[0].json;\nconst chatId = item.message.chat.id;\nconst text = item.message.text || '';\n\nif (text.toLowerCase() === '/start' || text.toLowerCase() === 'reiniciar') {\n  staticData.chats[chatId] = [];\n}\n\nif (!staticData.chats[chatId] || staticData.chats[chatId].length === 0) {\n  const systemPrompt = `Eres Fisioterapeuta Li, un asistente inteligente corporativo por Telegram.\nTu objetivo es ayudar a gestionar el negocio. Eres capaz de:\n1. Agendar citas (agendar_cita). Pide nombre, correo, fecha (YYYY-MM-DD), hora (HH:MM) y servicio.\n2. Consultar la agenda del día (consultar_agenda).\n3. Crear carpetas en Google Drive (crear_carpeta). Pide el nombre de la carpeta.\n4. Buscar archivos en Google Drive (buscar_archivo). Pide el nombre del archivo.\n5. Guardar reportes o notas en Google Sheets (guardar_reporte). Pide el texto de la nota.\n\nRESPONDE ÚNICAMENTE CON UN JSON VÁLIDO en este formato:\n{\n  \"estado\": \"conversar\" | \"agendar_cita\" | \"consultar_agenda\" | \"crear_carpeta\" | \"buscar_archivo\" | \"guardar_reporte\",\n  \"mensaje_usuario\": \"Lo que le dices al usuario en Telegram. Por ejemplo, confirmaciones o pedir datos faltantes.\",\n  \"datos\": {\n    \"nombre\": \"\",\n    \"correo\": \"\",\n    \"fecha\": \"\",\n    \"hora\": \"\",\n    \"servicio\": \"\",\n    \"nombre_carpeta\": \"\",\n    \"nombre_archivo\": \"\",\n    \"texto_reporte\": \"\"\n  }\n}\n\nREGLAS DE ESTADO:\n- 'conversar': Usa esto si el usuario te saluda, te hace una pregunta general, o si te faltan datos para ejecutar una de las otras acciones. Pide amablemente los datos faltantes.\n- 'agendar_cita': USA ESTO SOLO SI el usuario explícitamente confirmó que quiere reservar Y ya tienes nombre, correo, fecha, hora y servicio.\n- 'consultar_agenda': Usa esto si el usuario quiere saber las citas o la agenda de hoy.\n- 'crear_carpeta': Usa esto si el usuario te pidió crear una carpeta Y ya tienes el nombre de la carpeta.\n- 'buscar_archivo': Usa esto si el usuario quiere buscar un documento Y ya te dijo el nombre.\n- 'guardar_reporte': Usa esto si el usuario te pide registrar algo en el sistema/sábana Y ya tienes el texto.\n\nREGLAS DE DATOS:\n- Mantén siempre en el JSON los datos que ya hayas recolectado en el historial.`;\n\n  staticData.chats[chatId] = [{ role: 'system', content: systemPrompt }];\n}\n\nif (staticData.chats[chatId].length > 15) {\n  staticData.chats[chatId] = [staticData.chats[chatId][0], ...staticData.chats[chatId].slice(-14)];\n}\n\nstaticData.chats[chatId].push({ role: 'user', content: text });\n\nreturn [{ json: { chatId: chatId, messages: staticData.chats[chatId] } }];"
       },
       "id": "preparar-memoria",
       "name": "Preparar Memoria (StaticData)",
@@ -94,7 +94,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.1,
       "position": [
-        1250,
+        1500,
         450
       ],
       "credentials": {
@@ -113,13 +113,13 @@
           "parameters": [
             {
               "name": "X-API-Key",
-              "value": "cambiar-esto-por-una-api-key-segura"
+              "value": "reemplazar luego"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"cliente_nombre\": \"{{ $json.datos.nombre || 'Sin nombre' }}\",\n  \"fecha\": \"{{ $json.datos.fecha }}\",\n  \"hora\": \"{{ $json.datos.hora }}\",\n  \"servicio\": \"{{ $json.datos.servicio }}\",\n  \"telegram_id\": \"{{ $json.chatId }}\"\n}",
+        "jsonBody": "={\n  \"cliente_nombre\": \"{{ $json.datos.nombre || 'Sin nombre' }}\",\n  \"cliente_correo\": \"{{ $json.datos.correo }}\",\n  \"fecha\": \"{{ $json.datos.fecha }}\",\n  \"hora\": \"{{ $json.datos.hora }}\",\n  \"servicio\": \"{{ $json.datos.servicio }}\",\n  \"telegram_id\": \"{{ $json.chatId }}\"\n}",
         "options": {
           "ignoreResponseCode": true
         }
@@ -183,8 +183,8 @@
       "parameters": {
         "resource": "message",
         "subject": "=Confirmación de Cita - Fisioterapeuta Li",
-        "message": "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fdfa; border: 1px solid #e2f0e8; border-radius: 10px; overflow: hidden;\">\n    <div style=\"background-color: #2b7a5a; color: white; padding: 20px; text-align: center;\">\n        <h2 style=\"margin: 0; font-size: 24px;\">¡Cita Confirmada! 🌿</h2>\n        <p style=\"margin: 5px 0 0 0; font-size: 16px; opacity: 0.9;\">Fisioterapeuta Li</p>\n    </div>\n    <div style=\"padding: 30px; color: #333;\">\n        <p style=\"font-size: 16px;\">Hola <strong>{{ $node['Guardar Respuesta en Memoria'].json.datos.nombre }}</strong>,</p>\n        <p style=\"font-size: 16px; line-height: 1.5;\">Tu reserva ha sido agendada exitosamente en nuestro sistema. Aquí están los detalles de tu cita:</p>\n        \n        <div style=\"background-color: white; border-left: 4px solid #2b7a5a; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02);\">\n            <p style=\"margin: 5px 0;\"><strong>📋 Servicio:</strong> <span style=\"color: #2b7a5a;\">{{ $node['Guardar Respuesta en Memoria'].json.datos.servicio }}</span></p>\n            <p style=\"margin: 5px 0;\"><strong>📅 Fecha:</strong> {{ $node['Guardar Respuesta en Memoria'].json.datos.fecha }}</p>\n            <p style=\"margin: 5px 0;\"><strong>🕐 Hora:</strong> {{ $node['Guardar Respuesta en Memoria'].json.datos.hora }}</p>\n        </div>\n        \n        <p style=\"font-size: 15px; color: #666; line-height: 1.5;\">Si necesitas cancelar o reprogramar, por favor contáctanos con al menos 24 horas de anticipación a través de nuestro Bot en Telegram.</p>\n        <p style=\"font-size: 16px; margin-top: 30px;\">¡Te esperamos con gusto!</p>\n    </div>\n    <div style=\"background-color: #e2f0e8; padding: 15px; text-align: center; color: #555; font-size: 12px;\">\n        Este es un correo automático, por favor no respondas a este mensaje.\n    </div>\n</div>",
-        "toList": "fisioterapeutali@gmail.com",
+        "message": "=<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fdfa; border: 1px solid #e2f0e8; border-radius: 10px; overflow: hidden;\">\n    <div style=\"background-color: #2b7a5a; color: white; padding: 20px; text-align: center;\">\n        <h2 style=\"margin: 0; font-size: 24px;\">¡Cita Confirmada! 🌿</h2>\n        <p style=\"margin: 5px 0 0 0; font-size: 16px; opacity: 0.9;\">Fisioterapeuta Li</p>\n    </div>\n    <div style=\"padding: 30px; color: #333;\">\n        <p style=\"font-size: 16px;\">Hola <strong>{{ $node['Guardar Respuesta en Memoria'].json.datos.nombre }}</strong>,</p>\n        <p style=\"font-size: 16px; line-height: 1.5;\">Tu reserva ha sido agendada exitosamente en nuestro sistema. Aquí están los detalles de tu cita:</p>\n        \n        <div style=\"background-color: white; border-left: 4px solid #2b7a5a; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.02);\">\n            <p style=\"margin: 5px 0;\"><strong>📋 Servicio:</strong> <span style=\"color: #2b7a5a;\">{{ $node['Guardar Respuesta en Memoria'].json.datos.servicio }}</span></p>\n            <p style=\"margin: 5px 0;\"><strong>📅 Fecha:</strong> {{ $node['Guardar Respuesta en Memoria'].json.datos.fecha }}</p>\n            <p style=\"margin: 5px 0;\"><strong>🕐 Hora:</strong> {{ $node['Guardar Respuesta en Memoria'].json.datos.hora }}</p>\n        </div>\n        \n        <p style=\"font-size: 15px; color: #666; line-height: 1.5;\">Si necesitas cancelar o reprogramar, por favor contáctanos con al menos 24 horas de anticipación a través de nuestro Bot en Telegram.</p>\n        <p style=\"font-size: 16px; margin-top: 30px;\">¡Te esperamos con gusto!</p>\n    </div>\n    <div style=\"background-color: #e2f0e8; padding: 15px; text-align: center; color: #555; font-size: 12px;\">\n        Este es un correo automático, por favor no respondas a este mensaje.\n    </div>\n</div>",
+        "toList": "={{ $node['Guardar Respuesta en Memoria'].json.datos.correo }}",
         "appendAttribution": false
       },
       "id": "gmail-send",
@@ -274,18 +274,10 @@
             {
               "operation": "equal",
               "value2": "crear_carpeta"
-            },
-            {
-              "operation": "equal",
-              "value2": "buscar_archivo"
-            },
-            {
-              "operation": "equal",
-              "value2": "guardar_reporte"
             }
           ]
         },
-        "fallbackOutput": 5
+        "fallbackOutput": 3
       },
       "id": "enrutador-intenciones",
       "name": "Enrutador de Intenciones",
@@ -344,7 +336,7 @@
     {
       "parameters": {
         "operation": "create",
-        "name": "={{ ['Guardar Respuesta en Memoria'].json.datos.nombre_carpeta }}",
+        "name": "={{ $node['Guardar Respuesta en Memoria'].json.datos.nombre_carpeta }}",
         "options": {}
       },
       "id": "drive-crear-carpeta",
@@ -364,8 +356,8 @@
     },
     {
       "parameters": {
-        "chatId": "={{ ['Guardar Respuesta en Memoria'].json.chatId }}",
-        "text": "=✅ Carpeta creada en Google Drive:\n📁 Nombre: {{ ['Guardar Respuesta en Memoria'].json.datos.nombre_carpeta }}\n🔗 Enlace: {{ .webViewLink }}",
+        "chatId": "={{ $node['Guardar Respuesta en Memoria'].json.chatId }}",
+        "text": "=✅ Carpeta creada en Google Drive:\n📁 Nombre: {{ $node['Guardar Respuesta en Memoria'].json.datos.nombre_carpeta }}\n🔗 Enlace: {{ $json.webViewLink }}",
         "additionalFields": {}
       },
       "id": "telegram-carpeta",
@@ -386,7 +378,7 @@
     {
       "parameters": {
         "operation": "search",
-        "queryString": "=name contains '{{ ['Guardar Respuesta en Memoria'].json.datos.nombre_archivo }}'",
+        "queryString": "=name contains '{{ $node['Guardar Respuesta en Memoria'].json.datos.nombre_archivo }}'",
         "options": {}
       },
       "id": "drive-buscar",
@@ -394,7 +386,7 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 2,
       "position": [
-        1250,
+        1500,
         1000
       ],
       "credentials": {
@@ -406,7 +398,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ ['Guardar Respuesta en Memoria'].json.chatId }}",
+        "chatId": "={{ $node['Guardar Respuesta en Memoria'].json.chatId }}",
         "text": "=🔍 Resultados de búsqueda:\n\n{{ $json.length > 0 ? $json.map(f => '📄 ' + f.name + ' \\n🔗 ' + f.webViewLink).join('\\n\\n') : 'No se encontraron archivos con ese nombre.' }}",
         "additionalFields": {}
       },
@@ -415,7 +407,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.1,
       "position": [
-        1500,
+        1750,
         1000
       ],
       "credentials": {
@@ -444,7 +436,7 @@
           "values": [
             {
               "column": "Reporte",
-              "value": "={{ ['Guardar Respuesta en Memoria'].json.datos.texto_reporte }}"
+              "value": "={{ $node['Guardar Respuesta en Memoria'].json.datos.texto_reporte }}"
             }
           ]
         }
@@ -454,7 +446,7 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.1,
       "position": [
-        1250,
+        1500,
         1200
       ],
       "credentials": {
@@ -466,7 +458,7 @@
     },
     {
       "parameters": {
-        "chatId": "={{ ['Guardar Respuesta en Memoria'].json.chatId }}",
+        "chatId": "={{ $node['Guardar Respuesta en Memoria'].json.chatId }}",
         "text": "=✅ Reporte guardado en Google Sheets correctamente.",
         "additionalFields": {}
       },
@@ -475,7 +467,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.1,
       "position": [
-        1500,
+        1750,
         1200
       ],
       "credentials": {
@@ -484,6 +476,33 @@
           "name": "Telegram account"
         }
       }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.estado }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "equal",
+              "value2": "buscar_archivo"
+            },
+            {
+              "operation": "equal",
+              "value2": "guardar_reporte"
+            }
+          ]
+        },
+        "fallbackOutput": 2
+      },
+      "id": "enrutador-intenciones-2",
+      "name": "Enrutador de Intenciones 2",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        1250,
+        300
+      ]
     }
   ],
   "pinData": {},
@@ -526,24 +545,6 @@
         [
           {
             "node": "Enrutador de Intenciones",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "¿Ejecutar o Hablar?": {
-      "main": [
-        [
-          {
-            "node": "Guardar en BD (Backend)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Telegram Responder (Chat)",
             "type": "main",
             "index": 0
           }
@@ -637,21 +638,7 @@
         ],
         [
           {
-            "node": "Drive Buscar Archivo",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Sheets Guardar Reporte",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Telegram Responder (Chat)",
+            "node": "Enrutador de Intenciones 2",
             "type": "main",
             "index": 0
           }
@@ -696,6 +683,31 @@
         [
           {
             "node": "Telegram Responder (Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrutador de Intenciones 2": {
+      "main": [
+        [
+          {
+            "node": "Drive Buscar Archivo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sheets Guardar Reporte",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Responder (Chat)",
             "type": "main",
             "index": 0
           }
