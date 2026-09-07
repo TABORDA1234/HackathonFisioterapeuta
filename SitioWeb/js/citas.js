@@ -151,9 +151,9 @@ window.seleccionarDia = function(isoStr) {
   container.innerHTML = citasDelDia.map(c => {
     const time = new Date(c.fecha_hora).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
     let dot = 'gray';
-    if (c.estado==='confirmed') dot='var(--sem-ok)';
-    if (c.estado==='pending') dot='var(--sem-warn)';
-    if (c.estado==='cancelled') dot='var(--sem-danger)';
+    if (c.estado==='confirmed' || c.estado==='confirmada') dot='var(--sem-ok)';
+    if (c.estado==='pending' || c.estado==='pendiente') dot='var(--sem-warn)';
+    if (c.estado==='cancelled' || c.estado==='cancelada') dot='var(--sem-danger)';
     
     return `
     <div style="padding:var(--space-md); border-bottom:1px solid var(--color-border); cursor:pointer; transition:background var(--transition-fast);" onclick="abrirDetalleCita(${c.id})" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
@@ -279,9 +279,9 @@ window.abrirDetalleCita = function(id) {
   citaActiva = cita;
 
   let badge = '';
-  if (cita.estado==='confirmed') badge='<span class="badge badge-ok">Confirmada</span>';
-  if (cita.estado==='pending') badge='<span class="badge badge-warn">Pendiente</span>';
-  if (cita.estado==='cancelled') badge='<span class="badge badge-danger">Cancelada</span>';
+  if (cita.estado==='confirmada' || cita.estado==='confirmed') badge='<span class="badge badge-ok">Confirmada</span>';
+  if (cita.estado==='pendiente' || cita.estado==='pending') badge='<span class="badge badge-warn">Pendiente</span>';
+  if (cita.estado==='cancelada' || cita.estado==='cancelled') badge='<span class="badge badge-danger">Cancelada</span>';
 
   const d = new Date(cita.fecha_hora);
 
@@ -308,8 +308,8 @@ window.abrirDetalleCita = function(id) {
   const btnCanc = document.getElementById('modal-detalle-cancelar');
   const btnConf = document.getElementById('modal-detalle-confirmar');
   
-  btnCanc.style.display = cita.estado !== 'cancelled' ? 'inline-block' : 'none';
-  btnConf.style.display = cita.estado !== 'confirmed' ? 'inline-block' : 'none';
+  btnCanc.style.display = (cita.estado !== 'cancelled' && cita.estado !== 'cancelada') ? 'inline-block' : 'none';
+  btnConf.style.display = (cita.estado !== 'confirmed' && cita.estado !== 'confirmada') ? 'inline-block' : 'none';
 
   modalDetalle.classList.remove('hidden');
 };
@@ -326,8 +326,8 @@ async function cambiarEstadoCita(nuevoEstado) {
   }
 }
 
-document.getElementById('modal-detalle-cancelar').addEventListener('click', () => cambiarEstadoCita('cancelled'));
-document.getElementById('modal-detalle-confirmar').addEventListener('click', () => cambiarEstadoCita('confirmed'));
+document.getElementById('modal-detalle-cancelar').addEventListener('click', () => cambiarEstadoCita('cancelada'));
+document.getElementById('modal-detalle-confirmar').addEventListener('click', () => cambiarEstadoCita('confirmada'));
 
 // Inicializar
 cargarCitas();

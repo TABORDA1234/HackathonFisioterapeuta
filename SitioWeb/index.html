@@ -352,10 +352,7 @@
               <label for="bk-service">Servicio *</label>
               <select id="bk-service" required>
                 <option value="">Selecciona un servicio</option>
-                <option value="1">Valoración Inicial y Rehabilitación Física</option>
-                <option value="2">Prescripción de Ejercicio</option>
-                <option value="3">Modulación Postejercicio / Descargas Musculares</option>
-                <option value="4">Procedimientos Especializados</option>
+                <!-- Opciones cargadas dinámicamente -->
               </select>
             </div>
           </div>
@@ -729,6 +726,22 @@
   const dateInput = document.getElementById('bk-date');
   const serviceInput = document.getElementById('bk-service');
   dateInput.min = today;
+  
+  // Cargar servicios dinámicamente
+  async function cargarServicios() {
+    try {
+      if (window.ServiciosAPI) {
+        const res = await window.ServiciosAPI.list();
+        if (res.servicios && res.servicios.length > 0) {
+          serviceInput.innerHTML = '<option value="">Selecciona un servicio</option>' + 
+            res.servicios.map(s => `<option value="${s.id}">${s.nombre} (${s.duracion_min} min)</option>`).join('');
+        }
+      }
+    } catch (e) {
+      console.error("Error cargando servicios:", e);
+    }
+  }
+  cargarServicios();
   
   // Render loading initially
   timeSlotsContainer.innerHTML = '<p style="color:var(--color-text-muted); font-size: 0.9rem;">Selecciona una fecha y servicio para ver disponibilidad</p>';

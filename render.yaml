@@ -33,6 +33,10 @@ services:
         value: "15"
       - key: ANTICIPACION_MINIMA_HORAS
         value: "2"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
 
   # ── FRONTEND (Sitio Web Estático) ──
   - type: web

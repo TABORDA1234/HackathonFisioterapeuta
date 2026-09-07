@@ -14,6 +14,7 @@ from models.servicio import Servicio
 from schemas.cita_schema import CitaSchema, CitaUpdateSchema, CambiarEstadoSchema
 from utils.auth_middleware import jwt_required
 from utils.logger import registrar_operacion
+from utils.email_service import enviar_correo_confirmacion
 
 citas_bp = Blueprint("citas", __name__, url_prefix="/api/citas")
 
@@ -384,6 +385,17 @@ def reservar_cita():
         entidad_id=nueva_cita.id,
         detalle=f"Reserva web: {cliente.nombre} - {servicio.nombre} el {fecha_hora}",
         origen=origen,
+    )
+
+    # Enviar correo de confirmación
+    fecha_str = nueva_cita.fecha_hora.strftime("%Y-%m-%d")
+    hora_str = nueva_cita.fecha_hora.strftime("%H:%M")
+    enviar_correo_confirmacion(
+        nombre=cliente.nombre,
+        correo_destino=cliente.email,
+        servicio_nombre=servicio.nombre,
+        fecha=fecha_str,
+        hora=hora_str
     )
 
     return jsonify({
