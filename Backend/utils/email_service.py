@@ -16,6 +16,7 @@ def enviar_correo_confirmacion(nombre, correo_destino, servicio_nombre, fecha, h
         
         url = "https://api.brevo.com/v3/smtp/email"
         api_key = os.getenv('BREVO_API_KEY')
+        remitente = os.getenv('SMTP_USER', 'tu-correo@ejemplo.com')  # O SENDER_EMAIL
         
         if not api_key:
             print("[ERROR] No se ha configurado BREVO_API_KEY en el .env")

@@ -16,9 +16,7 @@ from utils.auth_middleware import jwt_required
 from utils.logger import registrar_operacion
 from utils.email_service import enviar_correo_confirmacion
 import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import requests
 
 citas_bp = Blueprint("citas", __name__, url_prefix="/api/citas")
 
@@ -573,29 +571,34 @@ def test_email_endpoint():
     if not destino:
         return jsonify({"error": "Debes proveer un ?destino=correo@ejemplo.com"}), 400
 
-    remitente = os.getenv('SMTP_USER')
-    password = os.getenv('SMTP_PASSWORD')
+    api_key = os.getenv('BREVO_API_KEY')
+    remitente = os.getenv('SMTP_USER', 'tu-correo@ejemplo.com')
 
-    if not remitente or not password:
-        return jsonify({"error": "SMTP_USER o SMTP_PASSWORD no están configurados en el servidor"}), 500
+    if not api_key:
+        return jsonify({"error": "BREVO_API_KEY no está configurado en el servidor"}), 500
 
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = "Correo de prueba desde Render"
-    msg['From'] = f"Diagnostico <{remitente}>"
-    msg['To'] = destino
-    msg.attach(MIMEText("Si recibes esto, el SMTP en Render funciona perfectamente.", 'html'))
+    url = "https://api.brevo.com/v3/smtp/email"
+    payload = {
+        "sender": {"name": "Diagnostico", "email": remitente},
+        "to": [{"email": destino, "name": "Usuario de Prueba"}],
+        "subject": "Correo de prueba desde Render (Brevo)",
+        "htmlContent": "<p>Si recibes esto, el envío por Brevo en Render funciona perfectamente.</p>"
+    }
+    headers = {
+        "accept": "application/json",
+        "api-key": api_key,
+        "content-type": "application/json"
+    }
 
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(remitente, password)
-        server.sendmail(remitente, destino, msg.as_string())
-        server.quit()
-        return jsonify({"success": True, "message": f"Correo enviado a {destino}"}), 200
-    except Exception as e:
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        return jsonify({"success": True, "message": f"Correo enviado a {destino} vía Brevo"}), 200
+    except requests.exceptions.RequestException as e:
+        err_msg = e.response.text if e.response else str(e)
         return jsonify({
             "success": False, 
             "error_type": type(e).__name__,
-            "error_detail": str(e),
-            "hint": "Si es SMTPAuthenticationError, puede ser que la contraseña de aplicación tenga espacios extra, comillas, o Google esté bloqueando la conexión desde Render."
+            "error_detail": err_msg,
+            "hint": "Verifica que la API Key de Brevo sea correcta y que el remitente (SMTP_USER) esté validado en Brevo."
         }), 500
