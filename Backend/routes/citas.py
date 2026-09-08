@@ -15,6 +15,10 @@ from schemas.cita_schema import CitaSchema, CitaUpdateSchema, CambiarEstadoSchem
 from utils.auth_middleware import jwt_required
 from utils.logger import registrar_operacion
 from utils.email_service import enviar_correo_confirmacion
+import os
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 citas_bp = Blueprint("citas", __name__, url_prefix="/api/citas")
 
@@ -558,3 +562,40 @@ def agenda():
         "citas": [c.to_dict() for c in citas],
         "total": len(citas),
     }), 200
+
+@citas_bp.route("/test-email", methods=["GET"])
+def test_email_endpoint():
+    """
+    Endpoint de diagnóstico para probar credenciales SMTP.
+    Envía un correo de prueba de forma síncrona y devuelve el error detallado.
+    """
+    destino = request.args.get("destino")
+    if not destino:
+        return jsonify({"error": "Debes proveer un ?destino=correo@ejemplo.com"}), 400
+
+    remitente = os.getenv('SMTP_USER')
+    password = os.getenv('SMTP_PASSWORD')
+
+    if not remitente or not password:
+        return jsonify({"error": "SMTP_USER o SMTP_PASSWORD no están configurados en el servidor"}), 500
+
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = "Correo de prueba desde Render"
+    msg['From'] = f"Diagnostico <{remitente}>"
+    msg['To'] = destino
+    msg.attach(MIMEText("Si recibes esto, el SMTP en Render funciona perfectamente.", 'html'))
+
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(remitente, password)
+        server.sendmail(remitente, destino, msg.as_string())
+        server.quit()
+        return jsonify({"success": True, "message": f"Correo enviado a {destino}"}), 200
+    except Exception as e:
+        return jsonify({
+            "success": False, 
+            "error_type": type(e).__name__,
+            "error_detail": str(e),
+            "hint": "Si es SMTPAuthenticationError, puede ser que la contraseña de aplicación tenga espacios extra, comillas, o Google esté bloqueando la conexión desde Render."
+        }), 500
