@@ -1,0 +1,28 @@
+# Backend — Fisioterapeuta Li
+
+## Archivos generados
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+## Entorno virtual
+venv/
+env/
+.venv/
+
+## Variables de entorno (nunca subir al repo)
+.env
+
+## IDE
+.vscode/
+.idea/
+
+## Docker
+postgres_data/
+
+## Migraciones (se generan con flask db init)
+migrations/versions/

@@ -12,16 +12,17 @@ def enviar_correo_confirmacion(nombre, correo_destino, servicio_nombre, fecha, h
         return
         
     def _enviar():
-        remitente = os.getenv('SMTP_USER')
-        password = os.getenv('SMTP_PASSWORD')
+        import requests
         
-        if not remitente or not password:
-            print("⚠️ No se han configurado SMTP_USER o SMTP_PASSWORD en el .env")
+        url = "https://api.brevo.com/v3/smtp/email"
+        api_key = os.getenv('BREVO_API_KEY')
+        
+        if not api_key:
+            print("[ERROR] No se ha configurado BREVO_API_KEY en el .env")
             return
             
         asunto = "¡Tu cita con Fisioterapeuta Li ha sido agendada! 🌿"
         
-        # El mismo diseño HTML que tenías en n8n
         html = f"""
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fdfa; border: 1px solid #e2f0e8; border-radius: 10px; overflow: hidden;">
             <div style="background-color: #2b7a5a; color: white; padding: 20px; text-align: center;">
@@ -47,24 +48,34 @@ def enviar_correo_confirmacion(nombre, correo_destino, servicio_nombre, fecha, h
         </div>
         """
         
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = asunto
-        msg['From'] = f"Fisioterapeuta Li <{remitente}>"
-        msg['To'] = correo_destino
+        payload = {
+            "sender": {
+                "name": "Fisioterapeuta Li",
+                "email": remitente
+            },
+            "to": [
+                {
+                    "email": correo_destino,
+                    "name": nombre
+                }
+            ],
+            "subject": asunto,
+            "htmlContent": html
+        }
         
-        parte_html = MIMEText(html, 'html')
-        msg.attach(parte_html)
-        
+        headers = {
+            "accept": "application/json",
+            "api-key": api_key,
+            "content-type": "application/json"
+        }
+
         try:
-            # Asumimos Gmail (puerto 587 con TLS)
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(remitente, password)
-            server.sendmail(remitente, correo_destino, msg.as_string())
-            server.quit()
-            print(f"[OK] Correo enviado exitosamente a {correo_destino}")
-        except Exception as e:
-            print(f"[ERROR] Fallo enviando correo a {correo_destino}: {e}")
+            response = requests.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+            print(f"[OK] Correo enviado exitosamente a {correo_destino} vía Brevo")
+        except requests.exceptions.RequestException as e:
+            err_msg = e.response.text if e.response else str(e)
+            print(f"[ERROR] Fallo enviando correo a {correo_destino}: {err_msg}")
 
     # Lanzar en un hilo separado para no bloquear la respuesta del API
     hilo = threading.Thread(target=_enviar)
