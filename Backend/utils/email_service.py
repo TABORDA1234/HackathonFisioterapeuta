@@ -62,9 +62,9 @@ def enviar_correo_confirmacion(nombre, correo_destino, servicio_nombre, fecha, h
             server.login(remitente, password)
             server.sendmail(remitente, correo_destino, msg.as_string())
             server.quit()
-            print(f"✅ Correo enviado exitosamente a {correo_destino}")
+            print(f"[OK] Correo enviado exitosamente a {correo_destino}")
         except Exception as e:
-            print(f"❌ Error enviando correo a {correo_destino}: {e}")
+            print(f"[ERROR] Fallo enviando correo a {correo_destino}: {e}")
 
     # Lanzar en un hilo separado para no bloquear la respuesta del API
     hilo = threading.Thread(target=_enviar)

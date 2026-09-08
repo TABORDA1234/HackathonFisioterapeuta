@@ -173,6 +173,8 @@ def listar_citas():
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 20, type=int)
     fecha_str = request.args.get("fecha")
+    fecha_inicio_str = request.args.get("fecha_inicio")
+    fecha_fin_str = request.args.get("fecha_fin")
     estado = request.args.get("estado")
     cliente_id = request.args.get("cliente_id", type=int)
 
@@ -186,6 +188,16 @@ def listar_citas():
             query = query.filter(Cita.fecha_hora.between(inicio, fin))
         except ValueError:
             return jsonify({"error": "Formato de fecha inválido"}), 400
+            
+    elif fecha_inicio_str and fecha_fin_str:
+        try:
+            f_ini = datetime.strptime(fecha_inicio_str, "%Y-%m-%d").date()
+            f_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d").date()
+            inicio = datetime.combine(f_ini, dtime.min)
+            fin = datetime.combine(f_fin, dtime.max)
+            query = query.filter(Cita.fecha_hora.between(inicio, fin))
+        except ValueError:
+            return jsonify({"error": "Formato de fecha de inicio/fin inválido"}), 400
 
     if estado:
         if estado not in ESTADOS_CITA:
@@ -196,14 +208,25 @@ def listar_citas():
         query = query.filter_by(cliente_id=cliente_id)
 
     query = query.order_by(Cita.fecha_hora.desc())
-    paginacion = query.paginate(page=page, per_page=per_page, error_out=False)
-
-    return jsonify({
-        "citas": [c.to_dict() for c in paginacion.items],
-        "total": paginacion.total,
-        "pagina": paginacion.page,
-        "paginas": paginacion.pages,
-    }), 200
+    
+    # Si viene paginación explicitamente o no viene rango de fechas
+    if request.args.get("page") or not (fecha_inicio_str and fecha_fin_str):
+        paginacion = query.paginate(page=page, per_page=per_page, error_out=False)
+        return jsonify({
+            "citas": [c.to_dict() for c in paginacion.items],
+            "total": paginacion.total,
+            "pagina": paginacion.page,
+            "paginas": paginacion.pages,
+        }), 200
+    else:
+        # Si pide rango de fechas (grid semanal) y no especifica paginación, devolver todo el rango
+        citas = query.all()
+        return jsonify({
+            "citas": [c.to_dict() for c in citas],
+            "total": len(citas),
+            "pagina": 1,
+            "paginas": 1,
+        }), 200
 
 
 @citas_bp.route("/<int:cita_id>", methods=["GET"])
