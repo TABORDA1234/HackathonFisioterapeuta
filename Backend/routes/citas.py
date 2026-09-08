@@ -319,6 +319,7 @@ def reservar_cita():
 
     nombre = data.get("cliente_nombre", "").strip()
     telefono = data.get("cliente_telefono", "").strip()
+    email = data.get("cliente_email", "").strip()
     servicio_id = data.get("servicio_id")
     fecha_hora_str = data.get("fecha_hora")
     origen = data.get("origen", "web")
@@ -364,9 +365,15 @@ def reservar_cita():
     # Buscar o crear cliente por teléfono
     cliente = Cliente.query.filter_by(telefono=telefono).first()
     if not cliente:
-        cliente = Cliente(nombre=nombre, telefono=telefono)
+        cliente = Cliente(nombre=nombre, telefono=telefono, email=email or None)
         db.session.add(cliente)
         db.session.flush()
+    else:
+        # Actualizar email si se proporcionó y el cliente no lo tenía
+        if email and not cliente.email:
+            cliente.email = email
+            db.session.add(cliente)
+            db.session.flush()
 
     # Crear la cita
     nueva_cita = Cita(

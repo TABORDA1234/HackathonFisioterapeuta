@@ -38,6 +38,8 @@ def webhook_nueva_cita():
 
     # Buscar o crear cliente
     cliente = None
+    email = data.get("cliente_email", "").strip()
+    
     if data.get("cliente_telefono"):
         cliente = Cliente.query.filter_by(telefono=data["cliente_telefono"]).first()
     if not cliente and data.get("telegram_id"):
@@ -49,9 +51,16 @@ def webhook_nueva_cita():
             nombre=data.get("cliente_nombre", "Cliente sin nombre"),
             telefono=data.get("cliente_telefono"),
             telegram_id=data.get("telegram_id"),
+            email=email or None
         )
         db.session.add(cliente)
         db.session.flush()  # Para obtener el ID
+    else:
+        # Actualizar email si se proporcionó y el cliente no lo tenía
+        if email and not cliente.email:
+            cliente.email = email
+            db.session.add(cliente)
+            db.session.flush()
 
     # Buscar servicio por nombre
     servicio_nombre = data.get("servicio", "")
