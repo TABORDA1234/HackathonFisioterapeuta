@@ -57,5 +57,7 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+      - key: SPREADSHEET_ID
+        sync: false
       - key: BACKEND_URL
         value: "https://fisio-backend-s25s.onrender.com"

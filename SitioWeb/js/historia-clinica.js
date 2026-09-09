@@ -51,6 +51,9 @@ function rellenarFormulario(hc) {
   };
 
   // Módulo 1
+  set('hc-nombre', hc.nombre);
+  set('hc-tel', hc.telefono);
+  set('hc-email', hc.email);
   set('hc-tipo-doc', hc.tipo_doc);
   set('hc-num-doc', hc.num_doc);
   set('hc-fec-nac', hc.fec_nac);
@@ -104,6 +107,7 @@ function rellenarFormulario(hc) {
   set('hc-diagnostico', hc.diagnostico);
   set('hc-objetivos', hc.objetivos);
 
+  set('hc-edad', hc.edad);
   if (hc.fec_nac) calcularEdad();
 }
 
