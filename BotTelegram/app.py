@@ -155,10 +155,29 @@ def handle_message(message):
         bot.reply_to(message, "Lo siento, tuve un pequeño problema procesando tu mensaje. ¿Me lo repites?")
 
 # ─────────────────────────────────────────────
-# Ejecución del Bot
+# Servidor Dummy para Render (Web Service)
 # ─────────────────────────────────────────────
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/plain')
+        self.end_headers()
+        self.wfile.write(b"Bot is running")
+        
+def run_dummy_server():
+    port = int(os.environ.get("PORT", 8080))
+    server_address = ('', port)
+    httpd = HTTPServer(server_address, HealthCheckHandler)
+    print(f"Dummy server listening on port {port}")
+    httpd.serve_forever()
 
 if __name__ == '__main__':
+    print("🤖 Iniciando servidor dummy de salud...")
+    threading.Thread(target=run_dummy_server, daemon=True).start()
+
     print("🤖 Bot de Telegram iniciando...")
     # Intentar limpiar webhooks previos si había alguno conflictivo
     bot.remove_webhook()

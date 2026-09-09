@@ -45,4 +45,17 @@ services:
     buildCommand: "echo 'Frontend build OK'"
     staticPublishPath: ./SitioWeb
 
-
+  # ── BOT TELEGRAM ──
+  - type: web
+    name: fisio-bot-telegram
+    env: python
+    plan: free
+    buildCommand: "cd BotTelegram && pip install -r requirements.txt"
+    startCommand: "cd BotTelegram && python app.py"
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: BACKEND_URL
+        value: "https://fisio-backend-s25s.onrender.com"
