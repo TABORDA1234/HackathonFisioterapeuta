@@ -86,16 +86,21 @@ function colocarCitasEnGrid() {
   citasCache.forEach(c => {
     if (!c.fecha_hora) return;
     // Extraer YYYY-MM-DD y HH:MM sin que el navegador cambie la zona horaria
-    const partes = c.fecha_hora.split(/[T ]/);
+    const cleanFecha = c.fecha_hora.split('+')[0].replace('Z', '');
+    const partes = cleanFecha.split(/[T ]/);
     const fecha = partes[0];
-    const hora = partes[1] ? partes[1].substring(0, 5) : '';
+    const horaExacta = partes[1] ? partes[1].substring(0, 5) : '';
+    const horaSlot = partes[1] ? partes[1].substring(0, 2) + ':00' : '';
     
-    // Buscar el slot
-    const slotEl = document.querySelector(`.schedule-slot[data-slot="${fecha}T${hora}"]`);
+    // Buscar el slot de la hora en punto correspondiente
+    const slotEl = document.querySelector(`.schedule-slot[data-slot="${fecha}T${horaSlot}"]`);
     if (slotEl) {
-      const cls = c.estado === 'confirmed' ? 'event-confirmed' : c.estado === 'pending' ? 'event-pending' : 'event-cancelled';
+      const cls = c.estado === 'confirmada' || c.estado === 'confirmed' ? 'event-confirmed' : 
+                  c.estado === 'pendiente' || c.estado === 'pending' ? 'event-pending' : 'event-cancelled';
+                  
       const evHtml = `<div class="schedule-event ${cls}" onclick="event.stopPropagation(); abrirDetalleCita(${c.id})" title="${c.cliente_nombre} - ${c.servicio_nombre}">
-        ${c.cliente_nombre.split(' ')[0]}
+        <div style="font-size: 0.7rem; opacity: 0.8; margin-bottom: 2px;">${horaExacta}</div>
+        <div>${c.cliente_nombre.split(' ')[0]}</div>
       </div>`;
       slotEl.innerHTML += evHtml;
     }
@@ -149,7 +154,9 @@ window.seleccionarDia = function(isoStr) {
   }
 
   container.innerHTML = citasDelDia.map(c => {
-    const time = new Date(c.fecha_hora).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
+    // Evitar que el navegador cambie la zona horaria restando horas
+    const cleanFecha = c.fecha_hora.split('+')[0].replace('Z', '');
+    const time = new Date(cleanFecha).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
     let dot = 'gray';
     if (c.estado==='confirmed' || c.estado==='confirmada') dot='var(--sem-ok)';
     if (c.estado==='pending' || c.estado==='pendiente') dot='var(--sem-warn)';
