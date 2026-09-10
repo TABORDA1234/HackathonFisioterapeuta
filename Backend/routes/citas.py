@@ -2,7 +2,8 @@
 Rutas de Citas — CRUD + disponibilidad + agenda.
 Este es el módulo central del sistema de reservas.
 """
-
+import json
+import threading
 from datetime import datetime, timedelta, timezone, time as dtime
 
 from flask import Blueprint, request, jsonify, current_app, g
