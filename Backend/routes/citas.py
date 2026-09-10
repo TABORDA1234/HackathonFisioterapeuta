@@ -14,7 +14,8 @@ from models.servicio import Servicio
 from schemas.cita_schema import CitaSchema, CitaUpdateSchema, CambiarEstadoSchema
 from utils.auth_middleware import jwt_required
 from utils.logger import registrar_operacion
-from utils.email_service import enviar_correo_confirmacion
+from utils.email_service import enviar_correo_confirmacion, notificar_nueva_cita
+from utils.google_calendar import crear_evento_calendario
 import os
 import requests
 
@@ -318,6 +319,18 @@ def crear_cita():
         origen=data.get("origen", "web"),
     )
 
+    # Intentar enviar notificación por email (se hace en segundo plano)
+    try:
+        threading.Thread(target=notificar_nueva_cita, args=(nueva_cita.id,), daemon=True).start()
+    except Exception as e:
+        print(f"Error al iniciar thread de notificación de correo: {e}")
+
+    # Intentar agendar en Google Calendar (se hace en segundo plano)
+    try:
+        threading.Thread(target=crear_evento_calendario, args=(nueva_cita, servicio), daemon=True).start()
+    except Exception as e:
+        print(f"Error al iniciar thread de Google Calendar: {e}")
+
     return jsonify({
         "message": "Cita creada exitosamente",
         "cita": nueva_cita.to_dict(),
@@ -429,6 +442,12 @@ def reservar_cita():
         fecha=fecha_str,
         hora=hora_str
     )
+
+    # Intentar agendar en Google Calendar (se hace en segundo plano)
+    try:
+        threading.Thread(target=crear_evento_calendario, args=(nueva_cita, servicio), daemon=True).start()
+    except Exception as e:
+        print(f"Error al iniciar thread de Google Calendar: {e}")
 
     return jsonify({
         "message": "Cita reservada exitosamente",
