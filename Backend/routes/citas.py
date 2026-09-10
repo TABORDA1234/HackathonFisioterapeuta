@@ -268,8 +268,11 @@ def crear_cita():
     if not cliente or not cliente.activo:
         return jsonify({"error": "Cliente no encontrado"}), 404
 
-    # Verificar que el servicio existe (con bloqueo pesimista para concurrencia)
-    servicio = Servicio.query.with_for_update().filter_by(id=data["servicio_id"]).first()
+    # Bloqueo pesimista GLOBAL para serializar todas las reservas y evitar solapamientos entre distintos servicios
+    db.session.query(Servicio).order_by(Servicio.id).with_for_update().first()
+    
+    # Verificar que el servicio existe
+    servicio = Servicio.query.get(data["servicio_id"])
     if not servicio or not servicio.activo:
         return jsonify({"error": "Servicio no encontrado"}), 404
 
@@ -369,8 +372,11 @@ def reservar_cita():
     if not fecha_hora_str:
         return jsonify({"error": "La fecha y hora son obligatorias"}), 400
 
-    # Verificar servicio (con bloqueo pesimista para concurrencia)
-    servicio = Servicio.query.with_for_update().filter_by(id=servicio_id).first()
+    # Bloqueo pesimista GLOBAL para serializar todas las reservas y evitar solapamientos entre distintos servicios
+    db.session.query(Servicio).order_by(Servicio.id).with_for_update().first()
+    
+    # Verificar servicio
+    servicio = Servicio.query.get(servicio_id)
     if not servicio or not servicio.activo:
         return jsonify({"error": "Servicio no encontrado"}), 404
 
