@@ -3,10 +3,11 @@ import google_auth_oauthlib.flow
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
-# Permisos que necesita el bot (Drive y Sheets)
+# Permisos que necesita el bot (Drive, Sheets y Calendar)
 SCOPES = [
     'https://www.googleapis.com/auth/drive.file',
-    'https://www.googleapis.com/auth/spreadsheets'
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/calendar'
 ]
 
 # Busca el archivo de client_secret
@@ -26,17 +27,17 @@ def main():
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
         
-    # Si no hay credenciales válidas, pedir login al usuario
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
+    # Si no hay credenciales válidas o NO tienen todos los permisos requeridos
+    if not creds or not creds.valid or not creds.has_scopes(SCOPES):
+        if creds and creds.expired and creds.refresh_token and creds.has_scopes(SCOPES):
             print("🔄 Refrescando token expirado...")
             creds.refresh(Request())
         else:
             print("🌐 Abriendo navegador para iniciar sesión en Google...")
-            # Aquí es donde se usa http://localhost:8080/
+            # Usamos localhost porque es lo que está registrado en Google Cloud
             flow = google_auth_oauthlib.flow.InstalledAppFlow.from_client_secrets_file(
                 CLIENT_SECRET_FILE, SCOPES)
-            creds = flow.run_local_server(port=8080)
+            creds = flow.run_local_server(host='localhost', port=8080)
             
         # Guardar las credenciales para la próxima vez
         with open('token.json', 'w') as token_file:

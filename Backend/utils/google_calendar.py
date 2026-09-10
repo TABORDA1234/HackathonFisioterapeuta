@@ -10,11 +10,35 @@ def get_calendar_service():
     (service_account.json) si existe, o como respaldo token.json (OAuth).
     """
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    backend_dir = os.path.dirname(os.path.dirname(__file__))
+    
     service_account_path = os.path.join(base_dir, 'service_account.json')
-    token_path = os.path.join(base_dir, 'BotTelegram', 'token.json')
+    token_path_bot = os.path.join(base_dir, 'BotTelegram', 'token.json')
+    token_path_backend = os.path.join(backend_dir, 'token.json')
     
     try:
-        # Priorizar Cuenta de Servicio de Google Cloud si existe el archivo
+        import json
+        
+        # 1. Leer Cuenta de Servicio desde Variable de Entorno (Seguro)
+        env_service_account = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
+        if env_service_account:
+            print("[Calendar] Usando cuenta de servicio desde Variable de Entorno")
+            info = json.loads(env_service_account)
+            SCOPES = ['https://www.googleapis.com/auth/calendar']
+            creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+            service = build('calendar', 'v3', credentials=creds)
+            return service
+            
+        # 2. Leer Token OAuth desde Variable de Entorno (Seguro)
+        env_token = os.getenv('GOOGLE_TOKEN_JSON')
+        if env_token:
+            print("[Calendar] Usando token OAuth desde Variable de Entorno")
+            info = json.loads(env_token)
+            creds = Credentials.from_authorized_user_info(info)
+            service = build('calendar', 'v3', credentials=creds)
+            return service
+            
+        # 3. Priorizar Cuenta de Servicio de Google Cloud si existe el archivo (Uso local)
         if os.path.exists(service_account_path):
             print(f"[Calendar] Usando cuenta de servicio: {service_account_path}")
             SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -22,10 +46,17 @@ def get_calendar_service():
             service = build('calendar', 'v3', credentials=creds)
             return service
             
-        # Respaldo: token.json (Generado por el flujo OAuth de usuario)
-        elif os.path.exists(token_path):
-            print(f"[Calendar] Usando token OAuth: {token_path}")
-            creds = Credentials.from_authorized_user_file(token_path)
+        # Respaldo 1: token.json en Backend
+        elif os.path.exists(token_path_backend):
+            print(f"[Calendar] Usando token OAuth en Backend: {token_path_backend}")
+            creds = Credentials.from_authorized_user_file(token_path_backend)
+            service = build('calendar', 'v3', credentials=creds)
+            return service
+            
+        # Respaldo 2: token.json en BotTelegram (Generado por el flujo OAuth de usuario)
+        elif os.path.exists(token_path_bot):
+            print(f"[Calendar] Usando token OAuth en Bot: {token_path_bot}")
+            creds = Credentials.from_authorized_user_file(token_path_bot)
             service = build('calendar', 'v3', credentials=creds)
             return service
             
