@@ -85,7 +85,7 @@ def crear_evento_calendario(cita, servicio_ofrecido):
         # La base de datos (Supabase) devuelve la fecha con zona horaria UTC (+00) 
         # a pesar de que el valor almacenado (ej. 08:00) es realmente la hora local.
         # Por lo tanto, REEMPLAZAMOS forzosamente la zona horaria a Colombia (UTC-5).
-        colombia_tz = datetime.timezone(datetime.timedelta(hours=-5))
+        colombia_tz = datetime.timezone(datetime.timedelta(hours=-0))
         inicio_dt = inicio_dt.replace(tzinfo=colombia_tz)
             
         fin_dt = inicio_dt + datetime.timedelta(minutes=duracion_min)
