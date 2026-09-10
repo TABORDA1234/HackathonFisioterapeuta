@@ -476,6 +476,8 @@ def actualizar_cita(cita_id):
     if errors:
         return jsonify({"error": "Datos inválidos", "detalle": errors}), 400
 
+    estado_anterior = cita.estado
+
     if "fecha_hora" in data:
         try:
             cita.fecha_hora = datetime.fromisoformat(str(data["fecha_hora"]))
@@ -488,6 +490,18 @@ def actualizar_cita(cita_id):
         cita.notas = data["notas"]
 
     db.session.commit()
+
+    if cita.estado == "confirmada" and estado_anterior != "confirmada":
+        if cita.cliente and cita.cliente.email:
+            fecha_str = cita.fecha_hora.strftime("%Y-%m-%d")
+            hora_str = cita.fecha_hora.strftime("%H:%M")
+            enviar_correo_cita_confirmada(
+                nombre=cita.cliente.nombre,
+                correo_destino=cita.cliente.email,
+                servicio_nombre=cita.servicio.nombre if cita.servicio else "Sesión",
+                fecha=fecha_str,
+                hora=hora_str
+            )
 
     registrar_operacion(
         accion="actualizar_cita",
