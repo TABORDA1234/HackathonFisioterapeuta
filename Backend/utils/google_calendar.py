@@ -83,9 +83,11 @@ def crear_evento_calendario(cita, servicio_ofrecido):
         inicio_dt = cita.fecha_hora
         
         # Google Calendar requiere que la fecha y hora tengan zona horaria.
-        # Si es naive, asumimos UTC ya que la base de datos guarda en UTC.
+        # La base de datos guarda la hora local de Colombia (UTC-5) de forma naive.
+        # Por lo tanto, le asignamos la zona horaria UTC-5.
         if inicio_dt.tzinfo is None:
-            inicio_dt = inicio_dt.replace(tzinfo=datetime.timezone.utc)
+            colombia_tz = datetime.timezone(datetime.timedelta(hours=-5))
+            inicio_dt = inicio_dt.replace(tzinfo=colombia_tz)
             
         fin_dt = inicio_dt + datetime.timedelta(minutes=duracion_min)
         
@@ -97,9 +99,11 @@ def crear_evento_calendario(cita, servicio_ofrecido):
             'description': f'Cita creada desde: {cita.origen}\\nNotas: {cita.notas or "N/A"}',
             'start': {
                 'dateTime': inicio_dt.isoformat(),
+                'timeZone': 'America/Bogota',
             },
             'end': {
                 'dateTime': fin_dt.isoformat(),
+                'timeZone': 'America/Bogota',
             },
             # Color 5 = amarillo/naranja, ideal para citas médicas.
             'colorId': '5',
