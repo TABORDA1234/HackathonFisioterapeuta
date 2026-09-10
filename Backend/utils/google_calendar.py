@@ -82,12 +82,11 @@ def crear_evento_calendario(cita, servicio_ofrecido):
         duracion_min = servicio_ofrecido.duracion_min if servicio_ofrecido else 60
         inicio_dt = cita.fecha_hora
         
-        # Google Calendar requiere que la fecha y hora tengan zona horaria.
-        # La base de datos guarda la hora local de Colombia (UTC-5) de forma naive.
-        # Por lo tanto, le asignamos la zona horaria UTC-5.
-        if inicio_dt.tzinfo is None:
-            colombia_tz = datetime.timezone(datetime.timedelta(hours=-5))
-            inicio_dt = inicio_dt.replace(tzinfo=colombia_tz)
+        # La base de datos (Supabase) devuelve la fecha con zona horaria UTC (+00) 
+        # a pesar de que el valor almacenado (ej. 08:00) es realmente la hora local.
+        # Por lo tanto, REEMPLAZAMOS forzosamente la zona horaria a Colombia (UTC-5).
+        colombia_tz = datetime.timezone(datetime.timedelta(hours=-5))
+        inicio_dt = inicio_dt.replace(tzinfo=colombia_tz)
             
         fin_dt = inicio_dt + datetime.timedelta(minutes=duracion_min)
         
