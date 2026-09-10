@@ -21,7 +21,12 @@ document.getElementById('btn-logout')?.addEventListener('click', () => Auth.logo
 let currentDate = new Date();
 let citasCache = [];
 
-// No demo data - we enforce real backend data
+// Helper para parsear la fecha de la base de datos como hora local (evita desfases por UTC)
+function parseLocal(fecha_hora) {
+  if (!fecha_hora) return new Date();
+  const clean = fecha_hora.split('+')[0].replace('Z', '');
+  return new Date(clean);
+}
 
 // ── Renderizado del Grid Semanal ──
 const HORAS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
@@ -108,8 +113,11 @@ function colocarCitasEnGrid() {
 }
 
 function calcularKPIs() {
-  const hoyStr = new Date().toISOString().split('T')[0];
-  const diasSemana = obtenerDiasSemana(currentDate).map(d => d.toISOString().split('T')[0]);
+  const hoyD = new Date();
+  const hoyStr = hoyD.getFullYear() + '-' + String(hoyD.getMonth() + 1).padStart(2, '0') + '-' + String(hoyD.getDate()).padStart(2, '0');
+  const diasSemana = obtenerDiasSemana(currentDate).map(d => {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  });
   
   let totalHoy = 0;
   let totalSemana = 0;
@@ -118,7 +126,7 @@ function calcularKPIs() {
 
   citasCache.forEach(c => {
     if (!c.fecha_hora) return;
-    const fecha = new Date(c.fecha_hora).toISOString().split('T')[0];
+    const fecha = c.fecha_hora.split('T')[0];
     
     if (fecha === hoyStr) totalHoy++;
     if (diasSemana.includes(fecha)) {
@@ -137,7 +145,7 @@ function calcularKPIs() {
 // ── Lista lateral del día ──
 window.seleccionarDia = function(isoStr) {
   const d = new Date(isoStr);
-  const strDate = d.toISOString().split('T')[0];
+  const strDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   
   document.getElementById('lista-dia-titulo').textContent = formatearFecha(d);
   
@@ -154,9 +162,8 @@ window.seleccionarDia = function(isoStr) {
   }
 
   container.innerHTML = citasDelDia.map(c => {
-    // Evitar que el navegador cambie la zona horaria restando horas
-    const cleanFecha = c.fecha_hora.split('+')[0].replace('Z', '');
-    const time = new Date(cleanFecha).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
+    // Formatear hora de forma segura
+      const time = parseLocal(c.fecha_hora).toLocaleTimeString('es-CO', {hour:'2-digit', minute:'2-digit'});
     let dot = 'gray';
     if (c.estado==='confirmed' || c.estado==='confirmada') dot='var(--sem-ok)';
     if (c.estado==='pending' || c.estado==='pendiente') dot='var(--sem-warn)';
@@ -290,7 +297,7 @@ window.abrirDetalleCita = function(id) {
   if (cita.estado==='pendiente' || cita.estado==='pending') badge='<span class="badge badge-warn">Pendiente</span>';
   if (cita.estado==='cancelada' || cita.estado==='cancelled') badge='<span class="badge badge-danger">Cancelada</span>';
 
-  const d = new Date(cita.fecha_hora);
+  const d = parseLocal(cita.fecha_hora);
 
   document.getElementById('modal-detalle-content').innerHTML = `
     <div style="display:flex; justify-content:space-between; margin-bottom:var(--space-md);">
@@ -336,5 +343,6 @@ async function cambiarEstadoCita(nuevoEstado) {
 document.getElementById('modal-detalle-cancelar').addEventListener('click', () => cambiarEstadoCita('cancelada'));
 document.getElementById('modal-detalle-confirmar').addEventListener('click', () => cambiarEstadoCita('confirmada'));
 
-// Inicializar
+// Inicializar y auto-refrescar (tiempo real)
 cargarCitas();
+setInterval(cargarCitas, 15000); // Actualiza cada 15 segundos

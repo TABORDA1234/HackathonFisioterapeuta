@@ -135,7 +135,9 @@
       .map((c) => {
         const badgeClass = c.estado === 'confirmada' ? 'badge-ok' : c.estado === 'pendiente' ? 'badge-warn' : 'badge-danger';
         const estadoLabel = c.estado === 'confirmada' ? 'Confirmada' : c.estado === 'pendiente' ? 'Pendiente' : 'Cancelada';
-        const horaStr = c.fecha_hora ? new Date(c.fecha_hora).toLocaleTimeString('es-CO', {hour: '2-digit', minute: '2-digit'}) : '--:--';
+        // Evitar desfase de zona horaria (UTC -> Local)
+        const cleanFecha = c.fecha_hora ? c.fecha_hora.split('+')[0].replace('Z', '') : null;
+        const horaStr = cleanFecha ? new Date(cleanFecha).toLocaleTimeString('es-CO', {hour: '2-digit', minute: '2-digit'}) : '--:--';
         const nombreStr = c.cliente_nombre || 'Desconocido';
         const servicioStr = c.servicio_nombre || 'Servicio no especificado';
         
@@ -527,7 +529,9 @@
     renderLastUpdated(new Date());
   }
 
+  // 9. Cargar inicial
   loadDashboard();
-  // Refresco automático cada 30s.
-  setInterval(loadDashboard, 30000);
+  
+  // Real-time updates cada 15 segundos
+  setInterval(loadDashboard, 15000);
 })();
