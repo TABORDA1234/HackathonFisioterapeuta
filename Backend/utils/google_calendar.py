@@ -1,25 +1,38 @@
 import os
 import datetime
 from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 def get_calendar_service():
     """
-    Obtiene el servicio de Google Calendar utilizando el token.json 
-    generado previamente por el Bot de Telegram.
+    Obtiene el servicio de Google Calendar utilizando una cuenta de servicio
+    (service_account.json) si existe, o como respaldo token.json (OAuth).
     """
-    # Intentar buscar token.json en la carpeta BotTelegram
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    service_account_path = os.path.join(base_dir, 'service_account.json')
     token_path = os.path.join(base_dir, 'BotTelegram', 'token.json')
     
-    if not os.path.exists(token_path):
-        print(f"[Calendar] No se encontró token.json en {token_path}")
-        return None
-        
     try:
-        creds = Credentials.from_authorized_user_file(token_path)
-        service = build('calendar', 'v3', credentials=creds)
-        return service
+        # Priorizar Cuenta de Servicio de Google Cloud si existe el archivo
+        if os.path.exists(service_account_path):
+            print(f"[Calendar] Usando cuenta de servicio: {service_account_path}")
+            SCOPES = ['https://www.googleapis.com/auth/calendar']
+            creds = service_account.Credentials.from_service_account_file(service_account_path, scopes=SCOPES)
+            service = build('calendar', 'v3', credentials=creds)
+            return service
+            
+        # Respaldo: token.json (Generado por el flujo OAuth de usuario)
+        elif os.path.exists(token_path):
+            print(f"[Calendar] Usando token OAuth: {token_path}")
+            creds = Credentials.from_authorized_user_file(token_path)
+            service = build('calendar', 'v3', credentials=creds)
+            return service
+            
+        else:
+            print("[Calendar] No se encontró service_account.json ni token.json")
+            return None
+            
     except Exception as e:
         print(f"[Calendar] Error al autenticar con Google Calendar: {e}")
         return None
@@ -61,7 +74,11 @@ def crear_evento_calendario(cita, servicio_ofrecido):
             'colorId': '5',
         }
         
-        event_result = service.events().insert(calendarId='primary', body=event).execute()
+        # Se requiere Calendar ID si se usa cuenta de servicio y se quiere ver en otro calendario.
+        # Por defecto 'primary' es el calendario propio de quien autoriza (o el de la service account).
+        calendar_id = os.getenv('GOOGLE_CALENDAR_ID', 'primary')
+        
+        event_result = service.events().insert(calendarId=calendar_id, body=event).execute()
         print(f"[Calendar] Evento creado exitosamente: {event_result.get('htmlLink')}")
         return True
         

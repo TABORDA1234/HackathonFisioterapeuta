@@ -14,7 +14,7 @@ from models.servicio import Servicio
 from schemas.cita_schema import CitaSchema, CitaUpdateSchema, CambiarEstadoSchema
 from utils.auth_middleware import jwt_required
 from utils.logger import registrar_operacion
-from utils.email_service import enviar_correo_confirmacion
+from utils.email_service import enviar_correo_reserva, enviar_correo_cita_confirmada
 from utils.google_calendar import crear_evento_calendario
 import os
 import requests
@@ -428,10 +428,10 @@ def reservar_cita():
         origen=origen,
     )
 
-    # Enviar correo de confirmación
+    # Enviar correo de confirmación de reserva
     fecha_str = nueva_cita.fecha_hora.strftime("%Y-%m-%d")
     hora_str = nueva_cita.fecha_hora.strftime("%H:%M")
-    enviar_correo_confirmacion(
+    enviar_correo_reserva(
         nombre=cliente.nombre,
         correo_destino=cliente.email,
         servicio_nombre=servicio.nombre,
@@ -520,6 +520,18 @@ def cambiar_estado(cita_id):
     estado_anterior = cita.estado
     cita.estado = data["estado"]
     db.session.commit()
+
+    if cita.estado == "confirmada" and estado_anterior != "confirmada":
+        if cita.cliente and cita.cliente.email:
+            fecha_str = cita.fecha_hora.strftime("%Y-%m-%d")
+            hora_str = cita.fecha_hora.strftime("%H:%M")
+            enviar_correo_cita_confirmada(
+                nombre=cita.cliente.nombre,
+                correo_destino=cita.cliente.email,
+                servicio_nombre=cita.servicio.nombre if cita.servicio else "Sesión",
+                fecha=fecha_str,
+                hora=hora_str
+            )
 
     registrar_operacion(
         accion="cambiar_estado_cita",
