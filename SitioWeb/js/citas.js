@@ -28,6 +28,12 @@ function parseLocal(fecha_hora) {
   return new Date(clean);
 }
 
+// Helper para obtener YYYY-MM-DD en hora local sin desfase UTC
+function formatLocalYMD(d) {
+  if (!d) return '';
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
 // ── Renderizado del Grid Semanal ──
 const HORAS = ['07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
 
@@ -70,7 +76,7 @@ function renderGridSemanal() {
   HORAS.forEach(h => {
     html += `<div class="schedule-time-cell">${h}</div>`;
     dias.forEach(d => {
-      const fechaStr = d.toISOString().split('T')[0];
+      const fechaStr = formatLocalYMD(d);
       const slotId = `${fechaStr}T${h}`;
       html += `<div class="schedule-slot" data-slot="${slotId}" onclick="nuevaCitaEnSlot('${fechaStr}', '${h}')"></div>`;
     });
@@ -114,10 +120,8 @@ function colocarCitasEnGrid() {
 
 function calcularKPIs() {
   const hoyD = new Date();
-  const hoyStr = hoyD.getFullYear() + '-' + String(hoyD.getMonth() + 1).padStart(2, '0') + '-' + String(hoyD.getDate()).padStart(2, '0');
-  const diasSemana = obtenerDiasSemana(currentDate).map(d => {
-    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-  });
+  const hoyStr = formatLocalYMD(hoyD);
+  const diasSemana = obtenerDiasSemana(currentDate).map(d => formatLocalYMD(d));
   
   let totalHoy = 0;
   let totalSemana = 0;
@@ -145,7 +149,7 @@ function calcularKPIs() {
 // ── Lista lateral del día ──
 window.seleccionarDia = function(isoStr) {
   const d = new Date(isoStr);
-  const strDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const strDate = formatLocalYMD(d);
   
   document.getElementById('lista-dia-titulo').textContent = formatearFecha(d);
   
@@ -185,8 +189,8 @@ window.seleccionarDia = function(isoStr) {
 // ── Cargar Datos ──
 async function cargarCitas() {
   const dias = obtenerDiasSemana(currentDate);
-  const inicio = dias[0].toISOString().split('T')[0];
-  const fin = dias[6].toISOString().split('T')[0];
+  const inicio = formatLocalYMD(dias[0]);
+  const fin = formatLocalYMD(dias[6]);
 
   try {
     const res = await CitasAPI.list({ fecha_inicio: inicio, fecha_fin: fin });
@@ -225,7 +229,7 @@ function cerrarModales() {
 document.getElementById('btn-nueva-cita').addEventListener('click', () => {
   document.getElementById('modal-cita-title').textContent = 'Nueva Cita';
   document.getElementById('form-cita').reset();
-  document.getElementById('cita-fecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('cita-fecha').value = formatLocalYMD(new Date());
   modalCita.classList.remove('hidden');
 });
 
