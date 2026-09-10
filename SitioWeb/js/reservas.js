@@ -81,7 +81,15 @@ function goToStep(n) {
     el.classList.toggle('done', ki < n);
   });
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Scroll suave hacia el contenedor del stepper en lugar del inicio de la página
+  const stepperEl = document.getElementById('stepper');
+  if (stepperEl) {
+    const yOffset = -80; // Un poco de espacio arriba para el header
+    const y = stepperEl.getBoundingClientRect().top + window.scrollY + yOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 /** ── PASO 1: Renderizar servicios ── */
