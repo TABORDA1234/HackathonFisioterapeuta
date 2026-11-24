@@ -192,4 +192,7 @@ docker compose up -d
 ```bash
 docker logs fisio_cloudflared
 ```
-Fin!!!!
+_________________________________________________
+
+Todos los proyectos, APIS y otros servicios han sido removidos en sus origenes, si encuentras una API key en este proyecto, ya debe estar inutilizada. Se publica unicamente con fines academicos y de investigacion. si encuentra alguna api key funcional en el se ofrecerá recompensa por la información. 
+
