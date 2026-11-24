@@ -743,6 +743,11 @@
   }
   cargarServicios();
   
+  // Bloquear fechas pasadas en el selector de fecha
+  const hoyLocal = new Date();
+  const hoyISO = `${hoyLocal.getFullYear()}-${String(hoyLocal.getMonth() + 1).padStart(2, '0')}-${String(hoyLocal.getDate()).padStart(2, '0')}`;
+  dateInput.min = hoyISO;
+
   // Render loading initially
   timeSlotsContainer.innerHTML = '<p style="color:var(--color-text-muted); font-size: 0.9rem;">Selecciona una fecha y servicio para ver disponibilidad</p>';
 
@@ -783,7 +788,12 @@
         });
       }
     } catch (e) {
-      timeSlotsContainer.innerHTML = '<p style="color:red; font-size: 0.9rem;">Error al cargar horarios.</p>';
+      const errP = document.createElement('p');
+      errP.style.color = 'red';
+      errP.style.fontSize = '0.9rem';
+      errP.textContent = e.message || 'Error al cargar horarios.';
+      timeSlotsContainer.innerHTML = '';
+      timeSlotsContainer.appendChild(errP);
     }
   }
 
